@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
-import 'login_screen.dart';
+import 'package:provider/provider.dart';
 import 'home_page.dart';
+import 'login_screen.dart';
+import 'models/language_model.dart';
+import 'language_screen.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(
+    ChangeNotifierProvider(create: (_) => LanguageModel(), child: MyApp()),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -16,6 +21,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => LoginScreen(),
         '/home': (context) => HomePage(),
+        '/language': (context) => LanguageScreen(),
       },
     );
   }
