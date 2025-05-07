@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'home_page.dart';
 import 'login_screen.dart';
 import 'models/language_model.dart';
-import 'language_screen.dart';
 import 'models/theme_model.dart';
 import 'theme_screen.dart';
+import 'language_screen.dart';
+import 'widgets/main_screen.dart';
+import 'user_profile_screen.dart'; // <-- Import MainScreen
 
 void main() {
   runApp(
@@ -39,11 +40,16 @@ class MyApp extends StatelessWidget {
         ),
       ),
       initialRoute: '/',
+      // main.dart
+      // Add this import
+
+      // Inside MaterialApp
       routes: {
         '/': (context) => LoginScreen(),
-        '/home': (context) => HomePage(),
+        '/home': (context) => MainScreen(),
         '/language': (context) => LanguageScreen(),
         '/theme': (context) => ThemeScreen(),
+        '/profile': (context) => UserProfileScreen(), // Add this route
       },
     );
   }
