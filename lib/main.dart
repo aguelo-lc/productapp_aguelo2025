@@ -4,24 +4,46 @@ import 'home_page.dart';
 import 'login_screen.dart';
 import 'models/language_model.dart';
 import 'language_screen.dart';
+import 'models/theme_model.dart';
+import 'theme_screen.dart';
 
 void main() {
   runApp(
-    ChangeNotifierProvider(create: (_) => LanguageModel(), child: MyApp()),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => LanguageModel()),
+        ChangeNotifierProvider(create: (_) => ThemeModel()),
+      ],
+      child: MyApp(),
+    ),
   );
 }
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final theme = Provider.of<ThemeModel>(context);
+
     return MaterialApp(
       title: 'Shop It!',
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        scaffoldBackgroundColor: theme.scaffoldColor,
+        appBarTheme: AppBarTheme(backgroundColor: theme.appBarColor),
+        textTheme: Theme.of(context).textTheme.apply(
+          bodyColor: theme.textColor,
+          displayColor: theme.textColor,
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(backgroundColor: theme.buttonColor),
+        ),
+      ),
       initialRoute: '/',
       routes: {
         '/': (context) => LoginScreen(),
         '/home': (context) => HomePage(),
         '/language': (context) => LanguageScreen(),
+        '/theme': (context) => ThemeScreen(),
       },
     );
   }

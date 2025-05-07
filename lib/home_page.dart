@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'models/language_model.dart';
+import 'models/theme_model.dart';
 import 'widgets/category_tile.dart';
 import 'widgets/trending_item.dart';
 import 'widgets/recommended_item.dart';
@@ -9,6 +10,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final lang = Provider.of<LanguageModel>(context);
+    final theme = Provider.of<ThemeModel>(context);
 
     final List<Map<String, dynamic>> categories = [
       {
@@ -31,25 +33,22 @@ class HomePage extends StatelessWidget {
 
     final List<Map<String, String>> trending = [
       {
-        'name': lang.isFilipino() ? 'Bloke' : 'Random Blocks',
+        'name': 'Random Blocks',
         'price': '₱100',
         'image': 'assets/images/random_blocks.jpg',
       },
       {
-        'name': lang.isFilipino() ? 'LEGO Tore' : 'LEGO Towers',
+        'name': 'LEGO Towers',
         'price': '₱250',
         'image': 'assets/images/lego_towers.jpg',
       },
       {
-        'name':
-            lang.isFilipino()
-                ? 'Singsing para sa Magkasintahan'
-                : 'Couple Rings',
+        'name': 'Couple Rings',
         'price': '₱200',
         'image': 'assets/images/couple_rings.jpg',
       },
       {
-        'name': lang.isFilipino() ? 'Salamin sa Araw' : 'Sunglasses',
+        'name': 'Sunglasses',
         'price': '₱150',
         'image': 'assets/images/sunglasses.jpg',
       },
@@ -57,43 +56,37 @@ class HomePage extends StatelessWidget {
 
     final List<Map<String, dynamic>> recommended = [
       {
-        'name': lang.isFilipino() ? 'Set ng Suksok sa Buhok' : 'Hair Brush Set',
+        'name': 'Hair Brush Set',
         'price': '₱99',
         'image': 'assets/images/hair_brush.jpg',
         'rating': 5,
       },
       {
-        'name': lang.isFilipino() ? 'Panulat na Pambulalakaw' : 'Fountain Pen',
+        'name': 'Fountain Pen',
         'price': '₱69',
         'image': 'assets/images/fountain_pen.jpg',
         'rating': 4,
       },
       {
-        'name': lang.isFilipino() ? 'Asul na Peryuk' : 'Blue Wig Synthetic',
+        'name': 'Blue Wig Synthetic',
         'price': '₱799',
         'image': 'assets/images/blue_wig.jpg',
         'rating': 5,
       },
       {
-        'name':
-            lang.isFilipino()
-                ? 'Gintong Kwelyo ng Alagang Hayop'
-                : 'Gold Pet Collar',
+        'name': 'Gold Pet Collar',
         'price': '₱129',
         'image': 'assets/images/gold_collar.jpg',
         'rating': 5,
       },
       {
-        'name':
-            lang.isFilipino()
-                ? 'Pang-artistikong Pang-ipit sa Buhok'
-                : 'Artsy Hair Clips',
+        'name': 'Artsy Hair Clips',
         'price': '₱79',
         'image': 'assets/images/hair_clips.jpg',
         'rating': 4,
       },
       {
-        'name': lang.isFilipino() ? 'Cute na Headband' : 'Cutie Headbands',
+        'name': 'Cutie Headbands',
         'price': '₱49',
         'image': 'assets/images/headbands.jpg',
         'rating': 4,
@@ -101,17 +94,18 @@ class HomePage extends StatelessWidget {
     ];
 
     return Scaffold(
+      backgroundColor: theme.scaffoldColor,
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
             DrawerHeader(
-              decoration: BoxDecoration(color: Colors.blue),
+              decoration: BoxDecoration(color: theme.drawerHeaderColor),
               child: Row(
                 children: [
                   CircleAvatar(
                     radius: 30,
-                    backgroundColor: Colors.blue[900],
+                    backgroundColor: theme.buttonColor,
                     child: Text("A", style: TextStyle(color: Colors.white)),
                   ),
                   SizedBox(width: 16),
@@ -123,23 +117,33 @@ class HomePage extends StatelessWidget {
               ),
             ),
             ListTile(
-              leading: Icon(Icons.color_lens),
-              title: Text(lang.isFilipino() ? 'Tema' : 'Theme'),
+              leading: Icon(Icons.color_lens, color: theme.textColor),
+              title: Text(
+                lang.isFilipino() ? 'Tema' : 'Theme',
+                style: TextStyle(color: theme.textColor),
+              ),
               onTap: () {
                 Navigator.pop(context);
+                Navigator.pushNamed(context, '/theme');
               },
             ),
             ListTile(
-              leading: Icon(Icons.language),
-              title: Text(lang.isFilipino() ? 'Wika' : 'Language'),
+              leading: Icon(Icons.language, color: theme.textColor),
+              title: Text(
+                lang.isFilipino() ? 'Wika' : 'Language',
+                style: TextStyle(color: theme.textColor),
+              ),
               onTap: () {
                 Navigator.pop(context);
                 Navigator.pushNamed(context, '/language');
               },
             ),
             ListTile(
-              leading: Icon(Icons.logout),
-              title: Text(lang.isFilipino() ? 'Mag-logout' : 'Logout'),
+              leading: Icon(Icons.logout, color: theme.textColor),
+              title: Text(
+                lang.isFilipino() ? 'Mag-logout' : 'Logout',
+                style: TextStyle(color: theme.textColor),
+              ),
               onTap: () {
                 Navigator.pushReplacementNamed(context, '/');
               },
@@ -155,19 +159,19 @@ class HomePage extends StatelessWidget {
                 children: [
                   GestureDetector(
                     onTap: () => Scaffold.of(context).openDrawer(),
-                    child: Icon(Icons.home),
+                    child: Icon(Icons.home, color: Colors.white),
                   ),
                   SizedBox(width: 8),
                   Text(lang.isFilipino() ? "Mamili Na!" : "Shop It!"),
                   Spacer(),
                   CircleAvatar(
-                    backgroundColor: Colors.blue[900],
+                    backgroundColor: theme.buttonColor,
                     child: Text("A", style: TextStyle(color: Colors.white)),
                   ),
                 ],
               ),
         ),
-        backgroundColor: Colors.blue,
+        backgroundColor: theme.appBarColor,
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(12),
@@ -203,12 +207,15 @@ class HomePage extends StatelessWidget {
               children: [
                 Text(
                   lang.isFilipino() ? "Mga Kategorya" : "Categories",
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: theme.textColor,
+                  ),
                 ),
                 Spacer(),
                 Text(
                   lang.isFilipino() ? "Tingnan Lahat" : "See All",
-                  style: TextStyle(color: Colors.blue),
+                  style: TextStyle(color: theme.buttonColor),
                 ),
               ],
             ),
@@ -228,7 +235,10 @@ class HomePage extends StatelessWidget {
             SizedBox(height: 20),
             Text(
               lang.isFilipino() ? "Uso Ngayon" : "Trending",
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: theme.textColor,
+              ),
             ),
             SizedBox(height: 8),
             SingleChildScrollView(
@@ -251,7 +261,10 @@ class HomePage extends StatelessWidget {
               lang.isFilipino()
                   ? "Inirerekomenda Para Sa Iyo"
                   : "Recommended For You",
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: theme.textColor,
+              ),
             ),
             SizedBox(height: 8),
             Column(
@@ -274,7 +287,7 @@ class HomePage extends StatelessWidget {
             Center(
               child: Text(
                 lang.isFilipino() ? "Tingnan Lahat" : "See All",
-                style: TextStyle(color: Colors.blue),
+                style: TextStyle(color: theme.buttonColor),
               ),
             ),
           ],

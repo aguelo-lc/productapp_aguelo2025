@@ -1,90 +1,79 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'models/language_model.dart';
+import 'models/theme_model.dart';
 
 class LoginScreen extends StatelessWidget {
-  final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  const LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final lang = Provider.of<LanguageModel>(context);
+    final theme = Provider.of<ThemeModel>(context);
+
     return Scaffold(
-      backgroundColor: Color(0xFF6A0DAD),
+      backgroundColor: theme.scaffoldColor,
       appBar: AppBar(
-        backgroundColor: Colors.blue,
-        title: Row(
-          children: [
-            Icon(Icons.home),
-            SizedBox(width: 8),
-            Text("Shop It!"),
-            Spacer(),
-            CircleAvatar(
-              backgroundColor: Colors.blue[900],
-              child: Text("A", style: TextStyle(color: Colors.white)),
-            )
-          ],
-        ),
+        title: Text(lang.isFilipino() ? 'Mag-login' : 'Login'),
+        backgroundColor: theme.appBarColor,
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0),
-        child: Center(
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                Text(
-                  "Whatever you need, we have it!",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                SizedBox(height: 20),
-                Text(
-                  "shop",
-                  style: TextStyle(
-                    fontSize: 60,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.deepPurple[800],
-                  ),
-                ),
-                SizedBox(height: 40),
-                TextField(
-                  controller: _usernameController,
-                  decoration: InputDecoration(
-                    hintText: 'Enter Username',
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 16),
-                TextField(
-                  controller: _passwordController,
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    hintText: 'Enter Password',
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 24),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/home');
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.lightBlue,
-                    padding: EdgeInsets.symmetric(horizontal: 40, vertical: 12),
-                  ),
-                  child: Text("Log In"),
-                )
-              ],
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              lang.isFilipino()
+                  ? 'Maligayang Pagdating sa Shop It!'
+                  : 'Welcome to Shop It!',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: theme.textColor,
+              ),
             ),
-          ),
+            SizedBox(height: 32),
+            TextField(
+              decoration: InputDecoration(
+                labelText: lang.isFilipino() ? 'Email' : 'Email',
+                labelStyle: TextStyle(color: theme.textColor),
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 16),
+            TextField(
+              obscureText: true,
+              decoration: InputDecoration(
+                labelText: lang.isFilipino() ? 'Password' : 'Password',
+                labelStyle: TextStyle(color: theme.textColor),
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, '/home');
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: theme.buttonColor,
+                padding: EdgeInsets.symmetric(horizontal: 48, vertical: 12),
+              ),
+              child: Text(
+                lang.isFilipino() ? 'Magpatuloy' : 'Continue',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+            SizedBox(height: 16),
+            TextButton(
+              onPressed: () {},
+              child: Text(
+                lang.isFilipino()
+                    ? 'Nakalimutan ang password?'
+                    : 'Forgot Password?',
+                style: TextStyle(color: theme.textColor),
+              ),
+            ),
+          ],
         ),
       ),
     );
