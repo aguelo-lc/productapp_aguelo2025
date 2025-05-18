@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'models/theme_model.dart'; // Adjust the import path
+import 'category_products_screen.dart'; // Adjust the import path
 
 class ProductDetailPage extends StatelessWidget {
   final String name;
@@ -8,6 +9,8 @@ class ProductDetailPage extends StatelessWidget {
   final String image;
   final int rating;
   final String description;
+  final Map<String, dynamic>? category;
+  final List<dynamic>? allCategories;
 
   const ProductDetailPage({
     super.key,
@@ -16,6 +19,8 @@ class ProductDetailPage extends StatelessWidget {
     required this.image,
     required this.rating,
     required this.description,
+    this.category,
+    this.allCategories,
   });
 
   @override
@@ -40,7 +45,9 @@ class ProductDetailPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Image.asset(image),
+                image.startsWith('http')
+                    ? Image.network(image)
+                    : Image.asset(image),
                 const SizedBox(height: 12),
                 Text(
                   name,
@@ -54,6 +61,55 @@ class ProductDetailPage extends StatelessWidget {
                   price,
                   style: const TextStyle(fontSize: 18, color: Colors.red),
                 ),
+                // Category section
+                if (category != null &&
+                    (category!['name']?.toString().isNotEmpty ?? false))
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: GestureDetector(
+                      onTap: () {
+                        if (allCategories != null) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => CategoryProductsScreen(
+                                    initialCategory: category!,
+                                    allCategories: allCategories!,
+                                  ),
+                            ),
+                          );
+                        }
+                      },
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Category:',
+                            style: TextStyle(
+                              color: theme.textColor,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Icon(
+                            Icons.category,
+                            color: theme.buttonColor,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            category!['name'],
+                            style: TextStyle(
+                              color: theme.buttonColor,
+                              fontWeight: FontWeight.w600,
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 Row(
                   children: List.generate(
                     5,

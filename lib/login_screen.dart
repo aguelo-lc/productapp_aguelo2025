@@ -2,9 +2,69 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'models/language_model.dart';
 import 'models/theme_model.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'config.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  bool _isLoading = false;
+  String? _errorMessage;
+  bool _isPasswordVisible = false;
+
+  Future<void> _login(BuildContext context) async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+    final lang = Provider.of<LanguageModel>(context, listen: false);
+    try {
+      final response = await http.post(
+        Uri.parse('${AppConfig.baseUrl}/api/auth/login'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'email': _emailController.text.trim(),
+          'password': _passwordController.text,
+        }),
+      );
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        // Save user_id to shared preferences
+        final prefs = await SharedPreferences.getInstance();
+        if (data['user'] != null && data['user']['id'] != null) {
+          await prefs.setInt('user_id', data['user']['id']);
+        }
+        Navigator.pushReplacementNamed(context, '/home');
+      } else {
+        final data = jsonDecode(response.body);
+        setState(() {
+          _errorMessage =
+              data['message'] ??
+              (lang.isFilipino()
+                  ? 'Hindi matagumpay ang pag-login.'
+                  : 'Login failed.');
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _errorMessage =
+            lang.isFilipino() ? 'May error sa koneksyon.' : 'Connection error.';
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +93,12 @@ class LoginScreen extends StatelessWidget {
               ),
             ),
             SizedBox(height: 32),
+            if (_errorMessage != null) ...[
+              Text(_errorMessage!, style: TextStyle(color: Colors.red)),
+              SizedBox(height: 16),
+            ],
             TextField(
+              controller: _emailController,
               decoration: InputDecoration(
                 labelText: lang.isFilipino() ? 'Email' : 'Email',
                 labelStyle: TextStyle(color: theme.textColor),
@@ -42,25 +107,50 @@ class LoginScreen extends StatelessWidget {
             ),
             SizedBox(height: 16),
             TextField(
-              obscureText: true,
+              controller: _passwordController,
+              obscureText: !_isPasswordVisible,
               decoration: InputDecoration(
                 labelText: lang.isFilipino() ? 'Password' : 'Password',
                 labelStyle: TextStyle(color: theme.textColor),
                 border: OutlineInputBorder(),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _isPasswordVisible
+                        ? Icons.visibility
+                        : Icons.visibility_off,
+                    color: theme.textColor,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _isPasswordVisible = !_isPasswordVisible;
+                    });
+                  },
+                ),
               ),
             ),
             SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushReplacementNamed(context, '/home');
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: theme.buttonColor,
-                padding: EdgeInsets.symmetric(horizontal: 48, vertical: 12),
-              ),
-              child: Text(
-                lang.isFilipino() ? 'Magpatuloy' : 'Continue',
-                style: TextStyle(color: Colors.white),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _isLoading ? null : () => _login(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: theme.buttonColor,
+                  padding: EdgeInsets.symmetric(horizontal: 48, vertical: 12),
+                ),
+                child:
+                    _isLoading
+                        ? SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                        : Text(
+                          lang.isFilipino() ? 'Magpatuloy' : 'Continue',
+                          style: TextStyle(color: Colors.white),
+                        ),
               ),
             ),
             SizedBox(height: 16),

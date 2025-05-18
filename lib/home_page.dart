@@ -1,97 +1,98 @@
+import 'dart:convert';
+import 'dart:math';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'config.dart';
 import 'models/language_model.dart';
 import 'models/theme_model.dart';
-import 'widgets/category_tile.dart';
-import 'widgets/trending_item.dart';
-import 'widgets/recommended_item.dart';
+import 'product_detail_page.dart';
+import 'add_product_screen.dart';
+import 'user_profile_screen.dart';
+import 'category_products_screen.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  List<dynamic> products = [];
+  List<dynamic> categoriesApi = [];
+  bool isLoading = true;
+  String? errorMessage;
+
+  final Random _random = Random();
+
+  @override
+  void initState() {
+    super.initState();
+    fetchProducts();
+    fetchCategories();
+  }
+
+  Future<void> fetchProducts() async {
+    setState(() {
+      isLoading = true;
+      errorMessage = null;
+    });
+    try {
+      final response = await http.get(
+        Uri.parse('${AppConfig.baseUrl}/api/products?all=1'),
+      );
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        setState(() {
+          products = data['data'] ?? [];
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          errorMessage = 'Failed to load products.';
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        errorMessage = 'Connection error.';
+        isLoading = false;
+      });
+    }
+  }
+
+  Future<void> fetchCategories() async {
+    try {
+      final response = await http.get(
+        Uri.parse('${AppConfig.baseUrl}/api/categories'),
+      );
+      if (response.statusCode == 200) {
+        setState(() {
+          categoriesApi = jsonDecode(response.body);
+        });
+      }
+    } catch (e) {
+      // Optionally handle error
+    }
+  }
+
+  List<dynamic> getRandomProducts(int count) {
+    if (products.length <= count) return List.from(products);
+    final List<dynamic> copy = List.from(products);
+    copy.shuffle(_random);
+    return copy.take(count).toList();
+  }
+
+  List<dynamic> getRandomCategories(int count) {
+    if (categoriesApi.length <= count) return List.from(categoriesApi);
+    final List<dynamic> copy = List.from(categoriesApi);
+    copy.shuffle(_random);
+    return copy.take(count).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     final lang = Provider.of<LanguageModel>(context);
     final theme = Provider.of<ThemeModel>(context);
-
-    final List<Map<String, dynamic>> categories = [
-      {
-        'icon': Icons.checkroom,
-        'label': lang.isFilipino() ? 'Damit' : 'Clothes',
-      },
-      {
-        'icon': Icons.weekend,
-        'label': lang.isFilipino() ? 'Kagamitan sa Bahay' : 'Furnitures',
-      },
-      {
-        'icon': Icons.electrical_services,
-        'label': lang.isFilipino() ? 'Elektroniko' : 'Electronics',
-      },
-      {
-        'icon': Icons.grass,
-        'label': lang.isFilipino() ? 'Panghalaman' : 'Garden Materials',
-      },
-    ];
-
-    final List<Map<String, String>> trending = [
-      {
-        'name': 'Random Blocks',
-        'price': '₱100',
-        'image': 'assets/images/random_blocks.jpg',
-      },
-      {
-        'name': 'LEGO Towers',
-        'price': '₱250',
-        'image': 'assets/images/lego_towers.jpg',
-      },
-      {
-        'name': 'Couple Rings',
-        'price': '₱200',
-        'image': 'assets/images/couple_rings.jpg',
-      },
-      {
-        'name': 'Sunglasses',
-        'price': '₱150',
-        'image': 'assets/images/sunglasses.jpg',
-      },
-    ];
-
-    final List<Map<String, dynamic>> recommended = [
-      {
-        'name': 'Hair Brush Set',
-        'price': '₱99',
-        'image': 'assets/images/hair_brush.jpg',
-        'rating': 5,
-      },
-      {
-        'name': 'Fountain Pen',
-        'price': '₱69',
-        'image': 'assets/images/fountain_pen.jpg',
-        'rating': 4,
-      },
-      {
-        'name': 'Blue Wig Synthetic',
-        'price': '₱799',
-        'image': 'assets/images/blue_wig.jpg',
-        'rating': 5,
-      },
-      {
-        'name': 'Gold Pet Collar',
-        'price': '₱129',
-        'image': 'assets/images/gold_collar.jpg',
-        'rating': 5,
-      },
-      {
-        'name': 'Artsy Hair Clips',
-        'price': '₱79',
-        'image': 'assets/images/hair_clips.jpg',
-        'rating': 4,
-      },
-      {
-        'name': 'Cutie Headbands',
-        'price': '₱49',
-        'image': 'assets/images/headbands.jpg',
-        'rating': 4,
-      },
-    ];
 
     return Scaffold(
       backgroundColor: theme.scaffoldColor,
@@ -173,126 +174,516 @@ class HomePage extends StatelessWidget {
         ),
         backgroundColor: theme.appBarColor,
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(12),
+      body:
+          isLoading
+              ? Center(child: CircularProgressIndicator())
+              : errorMessage != null
+              ? Center(child: Text(errorMessage!))
+              : RefreshIndicator(
+                onRefresh: () async {
+                  await fetchProducts();
+                  await fetchCategories();
+                },
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: EdgeInsets.all(12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextField(
+                        decoration: InputDecoration(
+                          hintText:
+                              lang.isFilipino()
+                                  ? 'Ano ang kailangan mo?'
+                                  : 'What do you need?',
+                          prefixIcon: Icon(Icons.search),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 12),
+                      Container(
+                        height: 200,
+                        margin: EdgeInsets.symmetric(vertical: 12),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          image: DecorationImage(
+                            image: AssetImage("assets/images/cyber_monday.jpg"),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      Row(
+                        children: [
+                          Text(
+                            lang.isFilipino() ? "Mga Kategorya" : "Categories",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: theme.textColor,
+                            ),
+                          ),
+                          Spacer(),
+                          Text(
+                            lang.isFilipino() ? "Tingnan Lahat" : "See All",
+                            style: TextStyle(color: theme.buttonColor),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 8),
+                      SizedBox(
+                        height: 90,
+                        child: ListView(
+                          scrollDirection: Axis.horizontal,
+                          children:
+                              getRandomCategories(8).map((cat) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder:
+                                            (context) => CategoryProductsScreen(
+                                              initialCategory: cat,
+                                              allCategories: categoriesApi,
+                                            ),
+                                      ),
+                                    );
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(right: 16.0),
+                                    child: SizedBox(
+                                      width: 72,
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Container(
+                                            width: 48,
+                                            height: 48,
+                                            decoration: BoxDecoration(
+                                              color: Colors.grey[200],
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                            clipBehavior: Clip.hardEdge,
+                                            child:
+                                                cat['image_path'] != null &&
+                                                        cat['image_path']
+                                                            .toString()
+                                                            .isNotEmpty
+                                                    ? Image.network(
+                                                      '${AppConfig.baseUrl}/storage/${cat['image_path']}',
+                                                      width: 48,
+                                                      height: 48,
+                                                      fit: BoxFit.cover,
+                                                      errorBuilder:
+                                                          (
+                                                            context,
+                                                            error,
+                                                            stackTrace,
+                                                          ) => Icon(
+                                                            Icons.broken_image,
+                                                            size: 32,
+                                                          ),
+                                                    )
+                                                    : Icon(
+                                                      Icons.category,
+                                                      size: 32,
+                                                    ),
+                                          ),
+                                          SizedBox(height: 4),
+                                          Flexible(
+                                            child: Text(
+                                              cat['name'] ?? '',
+                                              style: TextStyle(
+                                                color: theme.textColor,
+                                              ),
+                                              textAlign: TextAlign.center,
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      Text(
+                        lang.isFilipino() ? "Uso Ngayon" : "Trending",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: theme.textColor,
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children:
+                              getRandomProducts(6)
+                                  .map(
+                                    (item) => GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder:
+                                                (context) => ProductDetailPage(
+                                                  name: item['name'] ?? '',
+                                                  price: '₱${item['price']}',
+                                                  image:
+                                                      item['image_path'] !=
+                                                                  null &&
+                                                              item['image_path']
+                                                                  .toString()
+                                                                  .isNotEmpty
+                                                          ? '${AppConfig.baseUrl}/storage/${item['image_path']}'
+                                                          : 'assets/images/product_placeholder.png',
+                                                  rating: 5, // Default rating
+                                                  description:
+                                                      item['description'] ?? '',
+                                                  category:
+                                                      item['category'] ?? null,
+                                                  allCategories: categoriesApi,
+                                                ),
+                                          ),
+                                        );
+                                      },
+                                      child: TrendingItem(
+                                        image:
+                                            item['image_path'] != null &&
+                                                    item['image_path']
+                                                        .toString()
+                                                        .isNotEmpty
+                                                ? '${AppConfig.baseUrl}/storage/${item['image_path']}'
+                                                : 'assets/images/product_placeholder.png',
+                                        name: item['name'] ?? '',
+                                        price: '₱${item['price']}',
+                                        description: item['description'] ?? '',
+                                      ),
+                                    ),
+                                  )
+                                  .toList(),
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      Text(
+                        lang.isFilipino()
+                            ? "Inirerekomenda Para Sa Iyo"
+                            : "Recommended For You",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: theme.textColor,
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                      Column(
+                        children:
+                            getRandomProducts(6)
+                                .map(
+                                  (item) => RecommendedItem(
+                                    image:
+                                        item['image_path'] != null
+                                            ? '${AppConfig.baseUrl}/storage/${item['image_path']}'
+                                            : 'assets/images/product_placeholder.png',
+                                    name: item['name'] ?? '',
+                                    price: '₱${item['price']}',
+                                    rating:
+                                        5, // You can update this if you have ratings
+                                    description: item['description'] ?? '',
+                                  ),
+                                )
+                                .toList(),
+                      ),
+                      SizedBox(height: 20),
+                      Text(
+                        lang.isFilipino() ? "Mainit na Deal" : "Hot Deals",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: theme.textColor,
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children:
+                              getRandomProducts(6)
+                                  .map(
+                                    (item) => GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder:
+                                                (context) => ProductDetailPage(
+                                                  name: item['name'] ?? '',
+                                                  price: '₱${item['price']}',
+                                                  image:
+                                                      item['image_path'] !=
+                                                                  null &&
+                                                              item['image_path']
+                                                                  .toString()
+                                                                  .isNotEmpty
+                                                          ? '${AppConfig.baseUrl}/storage/${item['image_path']}'
+                                                          : 'assets/images/product_placeholder.png',
+                                                  rating: 5, // Default rating
+                                                  description:
+                                                      item['description'] ?? '',
+                                                  category:
+                                                      item['category'] ?? null,
+                                                  allCategories: categoriesApi,
+                                                ),
+                                          ),
+                                        );
+                                      },
+                                      child: TrendingItem(
+                                        image:
+                                            item['image_path'] != null &&
+                                                    item['image_path']
+                                                        .toString()
+                                                        .isNotEmpty
+                                                ? '${AppConfig.baseUrl}/storage/${item['image_path']}'
+                                                : 'assets/images/product_placeholder.png',
+                                        name: item['name'] ?? '',
+                                        price: '₱${item['price']}',
+                                        description: item['description'] ?? '',
+                                      ),
+                                    ),
+                                  )
+                                  .toList(),
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      Text(
+                        lang.isFilipino() ? "Pinili ng Admin" : "Admin's Picks",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: theme.textColor,
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                      Column(
+                        children:
+                            getRandomProducts(5)
+                                .map(
+                                  (item) => RecommendedItem(
+                                    image:
+                                        item['image_path'] != null
+                                            ? '${AppConfig.baseUrl}/storage/${item['image_path']}'
+                                            : 'assets/images/product_placeholder.png',
+                                    name: item['name'] ?? '',
+                                    price: '₱${item['price']}',
+                                    rating: 5,
+                                    description: item['description'] ?? '',
+                                  ),
+                                )
+                                .toList(),
+                      ),
+                      SizedBox(height: 20),
+                      Center(
+                        child: Text(
+                          lang.isFilipino() ? "Tingnan Lahat" : "See All",
+                          style: TextStyle(color: theme.buttonColor),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+    );
+  }
+}
+
+class TrendingItem extends StatelessWidget {
+  final String image;
+  final String name;
+  final String price;
+  final String description;
+
+  const TrendingItem({
+    required this.image,
+    required this.name,
+    required this.price,
+    required this.description,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder:
+                (context) => ProductDetailPage(
+                  name: name,
+                  price: price,
+                  image: image,
+                  rating: 5, // Default rating, update if you have ratings
+                  description: description,
+                ),
+          ),
+        );
+      },
+      child: Container(
+        width: 180,
+        margin: EdgeInsets.only(right: 12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextField(
-              decoration: InputDecoration(
-                hintText:
-                    lang.isFilipino()
-                        ? 'Ano ang kailangan mo?'
-                        : 'What do you need?',
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-            ),
-            SizedBox(height: 12),
-            Container(
-              height: 200,
-              margin: EdgeInsets.symmetric(vertical: 12),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                image: DecorationImage(
-                  image: AssetImage("assets/images/cyber_monday.jpg"),
+            image.startsWith('http')
+                ? Image.network(
+                  image,
+                  height: 120,
+                  width: 180,
+                  fit: BoxFit.cover,
+                )
+                : Image.asset(
+                  image,
+                  height: 120,
+                  width: 180,
                   fit: BoxFit.cover,
                 ),
-              ),
-            ),
-            SizedBox(height: 20),
-            Row(
-              children: [
-                Text(
-                  lang.isFilipino() ? "Mga Kategorya" : "Categories",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: theme.textColor,
-                  ),
-                ),
-                Spacer(),
-                Text(
-                  lang.isFilipino() ? "Tingnan Lahat" : "See All",
-                  style: TextStyle(color: theme.buttonColor),
-                ),
-              ],
-            ),
-            SizedBox(height: 8),
-            Wrap(
-              spacing: 16,
-              children:
-                  categories
-                      .map(
-                        (cat) => CategoryTile(
-                          icon: cat['icon'],
-                          label: cat['label'],
-                        ),
-                      )
-                      .toList(),
-            ),
-            SizedBox(height: 20),
+            SizedBox(height: 6),
             Text(
-              lang.isFilipino() ? "Uso Ngayon" : "Trending",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: theme.textColor,
-              ),
+              name,
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
             ),
-            SizedBox(height: 8),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children:
-                    trending
-                        .map(
-                          (item) => TrendingItem(
-                            image: item['image']!,
-                            name: item['name']!,
-                            price: item['price']!,
-                          ),
-                        )
-                        .toList(),
-              ),
-            ),
-            SizedBox(height: 20),
+            Text(price, style: TextStyle(color: Colors.red)),
             Text(
-              lang.isFilipino()
-                  ? "Inirerekomenda Para Sa Iyo"
-                  : "Recommended For You",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: theme.textColor,
-              ),
-            ),
-            SizedBox(height: 8),
-            Column(
-              children:
-                  recommended
-                      .map(
-                        (item) => RecommendedItem(
-                          image: item['image'],
-                          name: item['name'],
-                          price: item['price'],
-                          rating: item['rating'],
-                          description:
-                              lang.isFilipino()
-                                  ? 'Ang headband ay isang aksesorya na isinusuot sa buhok...'
-                                  : 'A headband or hairband is a clothing accessory worn in the hair...',
-                        ),
-                      )
-                      .toList(),
-            ),
-            Center(
-              child: Text(
-                lang.isFilipino() ? "Tingnan Lahat" : "See All",
-                style: TextStyle(color: theme.buttonColor),
-              ),
+              description,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 12),
             ),
           ],
         ),
       ),
     );
+  }
+}
+
+class RecommendedItem extends StatelessWidget {
+  final String image;
+  final String name;
+  final String price;
+  final int rating;
+  final String description;
+
+  const RecommendedItem({
+    required this.image,
+    required this.name,
+    required this.price,
+    required this.rating,
+    required this.description,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Provider.of<ThemeModel>(context);
+
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder:
+                (context) => ProductDetailPage(
+                  name: name,
+                  price: price,
+                  image: image,
+                  rating: rating,
+                  description: description,
+                ),
+          ),
+        );
+      },
+      child: ListTile(
+        contentPadding: EdgeInsets.symmetric(vertical: 6),
+        leading:
+            image.startsWith('http')
+                ? Image.network(image, width: 80, height: 80, fit: BoxFit.cover)
+                : Image.asset(image, width: 80, height: 80, fit: BoxFit.cover),
+        title: Text(name, style: TextStyle(fontWeight: FontWeight.w500)),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(price, style: TextStyle(color: Colors.red)),
+            Row(
+              children: List.generate(
+                5,
+                (index) => Icon(
+                  Icons.star,
+                  size: 16,
+                  color: index < rating ? theme.starColor : Colors.grey[300],
+                ),
+              ),
+            ),
+            Text(
+              description,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 12),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class MainScreen extends StatefulWidget {
+  @override
+  _MainScreenState createState() => _MainScreenState();
+}
+
+class _MainScreenState extends State<MainScreen> {
+  int _currentIndex = 0;
+
+  final List<Widget> _screens = [
+    HomePage(),
+    AddProductScreen(),
+    UserProfileScreen(), // Placeholder
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: _screens[_currentIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        items: [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.add_box),
+            label: 'Add Product',
+          ),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+        ],
+      ),
+    );
+  }
+}
+
+class CategoryTile extends StatelessWidget {
+  final IconData icon;
+  final String label;
+
+  const CategoryTile({required this.icon, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(children: [Icon(icon), SizedBox(height: 4), Text(label)]);
   }
 }
