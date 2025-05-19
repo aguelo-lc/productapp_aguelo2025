@@ -39,7 +39,7 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen> {
     try {
       final response = await http.get(
         Uri.parse(
-          '${AppConfig.baseUrl}/api/products?category_id=${selectedCategory['id']}',
+          '${AppConfig.baseUrl}/api/categories/${selectedCategory['id']}/products',
         ),
       );
       if (response.statusCode == 200) {

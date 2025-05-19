@@ -1,10 +1,33 @@
 // lib/user_profile_screen.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'models/language_model.dart';
 import 'models/theme_model.dart';
 
-class UserProfileScreen extends StatelessWidget {
+class UserProfileScreen extends StatefulWidget {
+  @override
+  State<UserProfileScreen> createState() => _UserProfileScreenState();
+}
+
+class _UserProfileScreenState extends State<UserProfileScreen> {
+  String? username;
+  String? email;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserInfo();
+  }
+
+  Future<void> _loadUserInfo() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      username = prefs.getString('username') ?? '';
+      email = prefs.getString('email') ?? '';
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final lang = Provider.of<LanguageModel>(context);
@@ -23,13 +46,15 @@ class UserProfileScreen extends StatelessWidget {
               radius: 50,
               backgroundColor: theme.buttonColor,
               child: Text(
-                'A',
+                (username != null && username!.isNotEmpty)
+                    ? username![0].toUpperCase()
+                    : '',
                 style: TextStyle(fontSize: 40, color: Colors.white),
               ),
             ),
             SizedBox(height: 16),
             Text(
-              'Alex Dela Cruz',
+              username ?? '',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -38,7 +63,7 @@ class UserProfileScreen extends StatelessWidget {
             ),
             SizedBox(height: 8),
             Text(
-              'alex@example.com',
+              email ?? '',
               style: TextStyle(fontSize: 16, color: theme.textColor),
             ),
             SizedBox(height: 24),

@@ -9,6 +9,11 @@ import 'models/language_model.dart';
 import 'config.dart';
 
 class AddProductScreen extends StatefulWidget {
+  final Map<String, dynamic>? product; // <-- Add this line
+
+  AddProductScreen({this.product, Key? key})
+    : super(key: key); // <-- Update constructor
+
   @override
   _AddProductScreenState createState() => _AddProductScreenState();
 }
@@ -30,6 +35,13 @@ class _AddProductScreenState extends State<AddProductScreen> {
   @override
   void initState() {
     super.initState();
+    if (widget.product != null) {
+      _productName = widget.product!['name'] ?? '';
+      _price = widget.product!['price']?.toString() ?? '';
+      _description = widget.product!['description'] ?? '';
+      _selectedCategory = widget.product!['category_id']?.toString();
+      // Optionally handle image if you want to show it for editing
+    }
     fetchCategories();
     _loadUserId();
   }
@@ -56,12 +68,21 @@ class _AddProductScreenState extends State<AddProductScreen> {
     }
   }
 
+  bool _isPickingImage = false;
+
   Future<void> pickImage() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() {
-        _selectedImage = File(pickedFile.path);
-      });
+    if (_isPickingImage) return; // Prevent re-entry
+    setState(() => _isPickingImage = true);
+    try {
+      final picker = ImagePicker();
+      final picked = await picker.pickImage(source: ImageSource.gallery);
+      if (picked != null) {
+        setState(() {
+          _selectedImage = File(picked.path);
+        });
+      }
+    } finally {
+      setState(() => _isPickingImage = false);
     }
   }
 

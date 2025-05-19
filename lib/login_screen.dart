@@ -38,10 +38,15 @@ class _LoginScreenState extends State<LoginScreen> {
       );
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        // Save user_id to shared preferences
         final prefs = await SharedPreferences.getInstance();
         if (data['user'] != null && data['user']['id'] != null) {
           await prefs.setInt('user_id', data['user']['id']);
+          await prefs.setString('username', data['user']['username'] ?? '');
+          await prefs.setString('email', data['user']['email'] ?? '');
+        }
+        // Save token if present
+        if (data['token'] != null) {
+          await prefs.setString('token', data['token']);
         }
         Navigator.pushReplacementNamed(context, '/home');
       } else {

@@ -10,6 +10,8 @@ import 'product_detail_page.dart';
 import 'add_product_screen.dart';
 import 'user_profile_screen.dart';
 import 'category_products_screen.dart';
+import 'my_products_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -140,12 +142,67 @@ class _HomePageState extends State<HomePage> {
               },
             ),
             ListTile(
+              leading: Icon(Icons.category, color: theme.textColor),
+              title: Text(
+                lang.isFilipino() ? 'Mga Kategorya' : 'Categories',
+                style: TextStyle(color: theme.textColor),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+                if (categoriesApi.isNotEmpty) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder:
+                          (context) => CategoryProductsScreen(
+                            initialCategory: categoriesApi[0],
+                            allCategories: categoriesApi,
+                          ),
+                    ),
+                  );
+                }
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.inventory, color: theme.textColor),
+              title: Text(
+                lang.isFilipino() ? 'Aking Mga Produkto' : 'My Products',
+                style: TextStyle(color: theme.textColor),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => MyProductsScreen()),
+                );
+              },
+            ),
+            ListTile(
               leading: Icon(Icons.logout, color: theme.textColor),
               title: Text(
                 lang.isFilipino() ? 'Mag-logout' : 'Logout',
                 style: TextStyle(color: theme.textColor),
               ),
-              onTap: () {
+              onTap: () async {
+                final prefs = await SharedPreferences.getInstance();
+                final token = prefs.getString('token');
+                if (token != null) {
+                  try {
+                    await http.post(
+                      Uri.parse('${AppConfig.baseUrl}/api/auth/logout'),
+                      headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token,
+                      },
+                    );
+                  } catch (e) {
+                    // Optionally handle error
+                  }
+                  await prefs.remove('token');
+                  await prefs.remove('user_id');
+                  await prefs.remove('username');
+                  await prefs.remove('email');
+                }
                 Navigator.pushReplacementNamed(context, '/');
               },
             ),
