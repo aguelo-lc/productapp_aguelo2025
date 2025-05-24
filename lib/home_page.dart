@@ -18,7 +18,8 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage>
+    with AutomaticKeepAliveClientMixin {
   List<dynamic> products = [];
   List<dynamic> categoriesApi = [];
   bool isLoading = true;
@@ -92,7 +93,11 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context); // Required for AutomaticKeepAliveClientMixin
     final lang = Provider.of<LanguageModel>(context);
     final theme = Provider.of<ThemeModel>(context);
 
@@ -192,7 +197,7 @@ class _HomePageState extends State<HomePage> {
                       Uri.parse('${AppConfig.baseUrl}/api/auth/logout'),
                       headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + token,
+                        'Authorization': 'Bearer $token',
                       },
                     );
                   } catch (e) {
@@ -703,31 +708,21 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
 
-  final List<Widget> _screens = [
-    HomePage(),
-    AddProductScreen(),
-    UserProfileScreen(), // Placeholder
+  final List<Widget Function()> _screenBuilders = [
+    () => HomePage(),
+    () => AddProductScreen(),
+    () => UserProfileScreen(),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _screens[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add_box),
-            label: 'Add Product',
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-        ],
+      body: IndexedStack(
+        index: _currentIndex,
+        children: List.generate(
+          _screenBuilders.length,
+          (i) => _screenBuilders[i](),
+        ),
       ),
     );
   }

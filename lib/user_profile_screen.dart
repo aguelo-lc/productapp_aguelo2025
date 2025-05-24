@@ -4,8 +4,12 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'models/language_model.dart';
 import 'models/theme_model.dart';
+import 'package:http/http.dart' as http;
+import 'config.dart';
 
 class UserProfileScreen extends StatefulWidget {
+  const UserProfileScreen({super.key});
+
   @override
   State<UserProfileScreen> createState() => _UserProfileScreenState();
 }
@@ -83,7 +87,23 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 lang.isFilipino() ? 'Mag-logout' : 'Logout',
                 style: TextStyle(color: theme.textColor),
               ),
-              onTap: () {
+              onTap: () async {
+                final prefs = await SharedPreferences.getInstance();
+                final token = prefs.getString('token');
+                if (token != null) {
+                  try {
+                    await http.post(
+                      Uri.parse('${AppConfig.baseUrl}/api/auth/logout'),
+                      headers: {'Authorization': 'Bearer $token'},
+                    );
+                  } catch (e) {
+                    // Optionally handle error
+                  }
+                  await prefs.remove('token');
+                  await prefs.remove('user_id');
+                  await prefs.remove('username');
+                  await prefs.remove('email');
+                }
                 Navigator.pushReplacementNamed(context, '/');
               },
             ),

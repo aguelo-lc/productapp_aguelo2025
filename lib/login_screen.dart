@@ -44,9 +44,9 @@ class _LoginScreenState extends State<LoginScreen> {
           await prefs.setString('username', data['user']['username'] ?? '');
           await prefs.setString('email', data['user']['email'] ?? '');
         }
-        // Save token if present
-        if (data['token'] != null) {
-          await prefs.setString('token', data['token']);
+        // Save token using new API response
+        if (data['access_token'] != null) {
+          await prefs.setString('token', data['access_token']);
         }
         Navigator.pushReplacementNamed(context, '/home');
       } else {

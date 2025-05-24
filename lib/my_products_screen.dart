@@ -30,8 +30,19 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
     );
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
+      // Defensive: handle both single product and list
+      List<dynamic> products;
+      if (data is Map<String, dynamic> && data.containsKey('data')) {
+        products = data['data'] ?? [];
+      } else if (data is Map<String, dynamic> && data.containsKey('id')) {
+        products = [data];
+      } else if (data is List) {
+        products = data;
+      } else {
+        products = [];
+      }
       setState(() {
-        myProducts = data['data'] ?? [];
+        myProducts = products;
         isLoading = false;
       });
     } else {

@@ -4,6 +4,8 @@ import 'models/theme_model.dart';
 import 'models/language_model.dart';
 
 class ThemeScreen extends StatelessWidget {
+  const ThemeScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     final themeModel = Provider.of<ThemeModel>(context);

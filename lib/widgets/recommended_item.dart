@@ -11,6 +11,7 @@ class RecommendedItem extends StatelessWidget {
   final String description;
 
   const RecommendedItem({
+    super.key,
     required this.image,
     required this.name,
     required this.price,

@@ -11,14 +11,15 @@ import 'config.dart';
 class AddProductScreen extends StatefulWidget {
   final Map<String, dynamic>? product; // <-- Add this line
 
-  AddProductScreen({this.product, Key? key})
+  const AddProductScreen({this.product, Key? key})
     : super(key: key); // <-- Update constructor
 
   @override
   _AddProductScreenState createState() => _AddProductScreenState();
 }
 
-class _AddProductScreenState extends State<AddProductScreen> {
+class _AddProductScreenState extends State<AddProductScreen>
+    with AutomaticKeepAliveClientMixin {
   final _formKey = GlobalKey<FormState>();
 
   String _productName = '';
@@ -139,7 +140,11 @@ class _AddProductScreenState extends State<AddProductScreen> {
   }
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context); // Required for AutomaticKeepAliveClientMixin
     final lang = Provider.of<LanguageModel>(context);
 
     return Scaffold(
