@@ -8,7 +8,7 @@ import 'config.dart';
 
 class EditProductScreen extends StatefulWidget {
   final Map<String, dynamic> product;
-  EditProductScreen({required this.product, Key? key}) : super(key: key);
+  const EditProductScreen({required this.product, super.key});
 
   @override
   State<EditProductScreen> createState() => _EditProductScreenState();
@@ -108,7 +108,11 @@ class _EditProductScreenState extends State<EditProductScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Edit Product')),
+      appBar: AppBar(
+        title: Text('Edit Product'),
+        backgroundColor:
+            Theme.of(context).appBarTheme.backgroundColor ?? Colors.white,
+      ),
       body:
           _isSubmitting
               ? Center(child: CircularProgressIndicator())
@@ -122,49 +126,115 @@ class _EditProductScreenState extends State<EditProductScreen> {
                         onTap: pickImage,
                         child:
                             _imageFile != null
-                                ? Image.file(
-                                  _imageFile!,
-                                  width: 120,
-                                  height: 120,
-                                  fit: BoxFit.cover,
+                                ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(16),
+                                  child: Image.file(
+                                    _imageFile!,
+                                    width: 120,
+                                    height: 120,
+                                    fit: BoxFit.cover,
+                                  ),
                                 )
                                 : (widget.product['image_path'] != null &&
                                     widget.product['image_path']
                                         .toString()
                                         .isNotEmpty)
-                                ? Image.network(
-                                  '${AppConfig.baseUrl}/storage/${widget.product['image_path']}',
-                                  width: 120,
-                                  height: 120,
-                                  fit: BoxFit.cover,
+                                ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(16),
+                                  child: Image.network(
+                                    '${AppConfig.baseUrl}/storage/${widget.product['image_path']}',
+                                    width: 120,
+                                    height: 120,
+                                    fit: BoxFit.cover,
+                                  ),
                                 )
                                 : Container(
                                   width: 120,
                                   height: 120,
-                                  color: Colors.grey[300],
-                                  child: Icon(Icons.camera_alt, size: 40),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[200],
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(
+                                      color: Colors.grey[300]!,
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: Icon(
+                                    Icons.camera_alt,
+                                    size: 40,
+                                    color: Colors.grey[500],
+                                  ),
                                 ),
                       ),
+                      SizedBox(height: 18),
+                      if (_errorMessage != null) ...[
+                        Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.symmetric(
+                            vertical: 12,
+                            horizontal: 16,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.red.withOpacity(0.08),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            _errorMessage!,
+                            style: TextStyle(
+                              color: Colors.red,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                      ],
                       TextFormField(
                         initialValue: _productName,
-                        decoration: InputDecoration(labelText: 'Product Name'),
+                        decoration: InputDecoration(
+                          labelText: 'Product Name',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: BorderSide.none,
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey[100],
+                        ),
                         onChanged: (v) => _productName = v,
                         validator:
                             (v) => v == null || v.isEmpty ? 'Required' : null,
                       ),
+                      SizedBox(height: 14),
                       TextFormField(
                         initialValue: _price,
-                        decoration: InputDecoration(labelText: 'Price'),
+                        decoration: InputDecoration(
+                          labelText: 'Price',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: BorderSide.none,
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey[100],
+                        ),
                         keyboardType: TextInputType.number,
                         onChanged: (v) => _price = v,
                         validator:
                             (v) => v == null || v.isEmpty ? 'Required' : null,
                       ),
+                      SizedBox(height: 14),
                       TextFormField(
                         initialValue: _description,
-                        decoration: InputDecoration(labelText: 'Description'),
+                        decoration: InputDecoration(
+                          labelText: 'Description',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: BorderSide.none,
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey[100],
+                        ),
                         onChanged: (v) => _description = v,
                       ),
+                      SizedBox(height: 14),
                       DropdownButtonFormField<String>(
                         value: _selectedCategory,
                         items:
@@ -177,22 +247,40 @@ class _EditProductScreenState extends State<EditProductScreen> {
                                 )
                                 .toList(),
                         onChanged: (v) => setState(() => _selectedCategory = v),
-                        decoration: InputDecoration(labelText: 'Category'),
+                        decoration: InputDecoration(
+                          labelText: 'Category',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: BorderSide.none,
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey[100],
+                        ),
                         validator:
                             (v) => v == null || v.isEmpty ? 'Required' : null,
                       ),
-                      if (_errorMessage != null)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 8.0),
+                      SizedBox(height: 24),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: _isSubmitting ? null : submitEdit,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(context).primaryColor,
+                            padding: EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            elevation: 2,
+                          ),
                           child: Text(
-                            _errorMessage!,
-                            style: TextStyle(color: Colors.red),
+                            'Save Changes',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
                           ),
                         ),
-                      SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: _isSubmitting ? null : submitEdit,
-                        child: Text('Save Changes'),
                       ),
                     ],
                   ),

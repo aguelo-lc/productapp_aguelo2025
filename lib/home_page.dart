@@ -14,6 +14,8 @@ import 'my_products_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -97,7 +99,7 @@ class _HomePageState extends State<HomePage>
 
   @override
   Widget build(BuildContext context) {
-    super.build(context); // Required for AutomaticKeepAliveClientMixin
+    super.build(context);
     final lang = Provider.of<LanguageModel>(context);
     final theme = Provider.of<ThemeModel>(context);
 
@@ -108,18 +110,44 @@ class _HomePageState extends State<HomePage>
           padding: EdgeInsets.zero,
           children: [
             DrawerHeader(
-              decoration: BoxDecoration(color: theme.drawerHeaderColor),
+              decoration: BoxDecoration(
+                color: theme.drawerHeaderColor,
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(24),
+                  bottomRight: Radius.circular(24),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 8,
+                    offset: Offset(0, 4),
+                  ),
+                ],
+              ),
               child: Row(
                 children: [
                   CircleAvatar(
-                    radius: 30,
+                    radius: 32,
                     backgroundColor: theme.buttonColor,
-                    child: Text("A", style: TextStyle(color: Colors.white)),
+                    child: Text(
+                      "A",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
-                  SizedBox(width: 16),
-                  Text(
-                    lang.isFilipino() ? "Maligayang pagdating!" : "Welcome!",
-                    style: TextStyle(color: Colors.white, fontSize: 18),
+                  SizedBox(width: 20),
+                  Expanded(
+                    child: Text(
+                      lang.isFilipino() ? "Maligayang pagdating!" : "Welcome!",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -216,20 +244,33 @@ class _HomePageState extends State<HomePage>
       ),
       appBar: AppBar(
         automaticallyImplyLeading: false,
+        elevation: 4,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(bottom: Radius.circular(18)),
+        ),
         title: Builder(
           builder:
               (context) => Row(
                 children: [
                   GestureDetector(
                     onTap: () => Scaffold.of(context).openDrawer(),
-                    child: Icon(Icons.home, color: Colors.white),
+                    child: Icon(Icons.home, color: Colors.white, size: 28),
                   ),
-                  SizedBox(width: 8),
-                  Text(lang.isFilipino() ? "Mamili Na!" : "Shop It!"),
+                  SizedBox(width: 12),
+                  Text(
+                    lang.isFilipino() ? "Mamili Na!" : "Shop It!",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+                  ),
                   Spacer(),
                   CircleAvatar(
                     backgroundColor: theme.buttonColor,
-                    child: Text("A", style: TextStyle(color: Colors.white)),
+                    child: Text(
+                      "A",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -240,7 +281,12 @@ class _HomePageState extends State<HomePage>
           isLoading
               ? Center(child: CircularProgressIndicator())
               : errorMessage != null
-              ? Center(child: Text(errorMessage!))
+              ? Center(
+                child: Text(
+                  errorMessage!,
+                  style: TextStyle(fontSize: 18, color: Colors.red),
+                ),
+              )
               : RefreshIndicator(
                 onRefresh: () async {
                   await fetchProducts();
@@ -248,35 +294,63 @@ class _HomePageState extends State<HomePage>
                 },
                 child: SingleChildScrollView(
                   physics: const AlwaysScrollableScrollPhysics(),
-                  padding: EdgeInsets.all(12),
+                  padding: EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      TextField(
-                        decoration: InputDecoration(
-                          hintText:
-                              lang.isFilipino()
-                                  ? 'Ano ang kailangan mo?'
-                                  : 'What do you need?',
-                          prefixIcon: Icon(Icons.search),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 12),
                       Container(
-                        height: 200,
-                        margin: EdgeInsets.symmetric(vertical: 12),
                         decoration: BoxDecoration(
+                          color: theme.scaffoldColor,
                           borderRadius: BorderRadius.circular(12),
-                          image: DecorationImage(
-                            image: AssetImage("assets/images/cyber_monday.jpg"),
-                            fit: BoxFit.cover,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 8,
+                              offset: Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: TextField(
+                          decoration: InputDecoration(
+                            hintText:
+                                lang.isFilipino()
+                                    ? 'Ano ang kailangan mo?'
+                                    : 'What do you need?',
+                            prefixIcon: Icon(
+                              Icons.search,
+                              color: theme.buttonColor,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                            filled: true,
+                            fillColor: Colors.white,
                           ),
                         ),
                       ),
-                      SizedBox(height: 20),
+                      SizedBox(height: 18),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: Container(
+                          height: 200,
+                          decoration: BoxDecoration(
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black12,
+                                blurRadius: 10,
+                                offset: Offset(0, 6),
+                              ),
+                            ],
+                          ),
+                          child: Image.asset(
+                            "assets/images/cyber_monday.jpg",
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 28),
                       Row(
                         children: [
                           Text(
@@ -284,18 +358,22 @@ class _HomePageState extends State<HomePage>
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: theme.textColor,
+                              fontSize: 18,
                             ),
                           ),
                           Spacer(),
                           Text(
                             lang.isFilipino() ? "Tingnan Lahat" : "See All",
-                            style: TextStyle(color: theme.buttonColor),
+                            style: TextStyle(
+                              color: theme.buttonColor,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ],
                       ),
-                      SizedBox(height: 8),
+                      SizedBox(height: 12),
                       SizedBox(
-                        height: 90,
+                        height: 100,
                         child: ListView(
                           scrollDirection: Axis.horizontal,
                           children:
@@ -314,19 +392,26 @@ class _HomePageState extends State<HomePage>
                                     );
                                   },
                                   child: Padding(
-                                    padding: const EdgeInsets.only(right: 16.0),
+                                    padding: const EdgeInsets.only(right: 18.0),
                                     child: SizedBox(
-                                      width: 72,
+                                      width: 80,
                                       child: Column(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           Container(
-                                            width: 48,
-                                            height: 48,
+                                            width: 56,
+                                            height: 56,
                                             decoration: BoxDecoration(
                                               color: Colors.grey[200],
                                               borderRadius:
-                                                  BorderRadius.circular(8),
+                                                  BorderRadius.circular(12),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.black12,
+                                                  blurRadius: 6,
+                                                  offset: Offset(0, 3),
+                                                ),
+                                              ],
                                             ),
                                             clipBehavior: Clip.hardEdge,
                                             child:
@@ -336,8 +421,8 @@ class _HomePageState extends State<HomePage>
                                                             .isNotEmpty
                                                     ? Image.network(
                                                       '${AppConfig.baseUrl}/storage/${cat['image_path']}',
-                                                      width: 48,
-                                                      height: 48,
+                                                      width: 56,
+                                                      height: 56,
                                                       fit: BoxFit.cover,
                                                       errorBuilder:
                                                           (
@@ -354,12 +439,13 @@ class _HomePageState extends State<HomePage>
                                                       size: 32,
                                                     ),
                                           ),
-                                          SizedBox(height: 4),
+                                          SizedBox(height: 6),
                                           Flexible(
                                             child: Text(
                                               cat['name'] ?? '',
                                               style: TextStyle(
                                                 color: theme.textColor,
+                                                fontWeight: FontWeight.w500,
                                               ),
                                               textAlign: TextAlign.center,
                                               maxLines: 2,
@@ -374,66 +460,41 @@ class _HomePageState extends State<HomePage>
                               }).toList(),
                         ),
                       ),
-                      SizedBox(height: 20),
+                      SizedBox(height: 28),
+                      // Trending Section
                       Text(
                         lang.isFilipino() ? "Uso Ngayon" : "Trending",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: theme.textColor,
+                          fontSize: 18,
                         ),
                       ),
-                      SizedBox(height: 8),
+                      SizedBox(height: 12),
                       SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: Row(
                           children:
                               getRandomProducts(6)
                                   .map(
-                                    (item) => GestureDetector(
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder:
-                                                (context) => ProductDetailPage(
-                                                  name: item['name'] ?? '',
-                                                  price: '₱${item['price']}',
-                                                  image:
-                                                      item['image_path'] !=
-                                                                  null &&
-                                                              item['image_path']
-                                                                  .toString()
-                                                                  .isNotEmpty
-                                                          ? '${AppConfig.baseUrl}/storage/${item['image_path']}'
-                                                          : 'assets/images/product_placeholder.png',
-                                                  rating: 5, // Default rating
-                                                  description:
-                                                      item['description'] ?? '',
-                                                  category:
-                                                      item['category'] ?? null,
-                                                  allCategories: categoriesApi,
-                                                ),
-                                          ),
-                                        );
-                                      },
-                                      child: TrendingItem(
-                                        image:
-                                            item['image_path'] != null &&
-                                                    item['image_path']
-                                                        .toString()
-                                                        .isNotEmpty
-                                                ? '${AppConfig.baseUrl}/storage/${item['image_path']}'
-                                                : 'assets/images/product_placeholder.png',
-                                        name: item['name'] ?? '',
-                                        price: '₱${item['price']}',
-                                        description: item['description'] ?? '',
-                                      ),
+                                    (item) => TrendingItem(
+                                      image:
+                                          item['image_path'] != null &&
+                                                  item['image_path']
+                                                      .toString()
+                                                      .isNotEmpty
+                                              ? '${AppConfig.baseUrl}/storage/${item['image_path']}'
+                                              : 'assets/images/product_placeholder.png',
+                                      name: item['name'] ?? '',
+                                      price: '₱${item['price']}',
+                                      description: item['description'] ?? '',
                                     ),
                                   )
                                   .toList(),
                         ),
                       ),
-                      SizedBox(height: 20),
+                      SizedBox(height: 28),
+                      // Recommended Section
                       Text(
                         lang.isFilipino()
                             ? "Inirerekomenda Para Sa Iyo"
@@ -441,9 +502,10 @@ class _HomePageState extends State<HomePage>
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: theme.textColor,
+                          fontSize: 18,
                         ),
                       ),
-                      SizedBox(height: 8),
+                      SizedBox(height: 12),
                       Column(
                         children:
                             getRandomProducts(6)
@@ -455,81 +517,56 @@ class _HomePageState extends State<HomePage>
                                             : 'assets/images/product_placeholder.png',
                                     name: item['name'] ?? '',
                                     price: '₱${item['price']}',
-                                    rating:
-                                        5, // You can update this if you have ratings
+                                    rating: 5,
                                     description: item['description'] ?? '',
                                   ),
                                 )
                                 .toList(),
                       ),
-                      SizedBox(height: 20),
+                      SizedBox(height: 28),
+                      // Hot Deals Section
                       Text(
                         lang.isFilipino() ? "Mainit na Deal" : "Hot Deals",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: theme.textColor,
+                          fontSize: 18,
                         ),
                       ),
-                      SizedBox(height: 8),
+                      SizedBox(height: 12),
                       SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: Row(
                           children:
                               getRandomProducts(6)
                                   .map(
-                                    (item) => GestureDetector(
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder:
-                                                (context) => ProductDetailPage(
-                                                  name: item['name'] ?? '',
-                                                  price: '₱${item['price']}',
-                                                  image:
-                                                      item['image_path'] !=
-                                                                  null &&
-                                                              item['image_path']
-                                                                  .toString()
-                                                                  .isNotEmpty
-                                                          ? '${AppConfig.baseUrl}/storage/${item['image_path']}'
-                                                          : 'assets/images/product_placeholder.png',
-                                                  rating: 5, // Default rating
-                                                  description:
-                                                      item['description'] ?? '',
-                                                  category:
-                                                      item['category'] ?? null,
-                                                  allCategories: categoriesApi,
-                                                ),
-                                          ),
-                                        );
-                                      },
-                                      child: TrendingItem(
-                                        image:
-                                            item['image_path'] != null &&
-                                                    item['image_path']
-                                                        .toString()
-                                                        .isNotEmpty
-                                                ? '${AppConfig.baseUrl}/storage/${item['image_path']}'
-                                                : 'assets/images/product_placeholder.png',
-                                        name: item['name'] ?? '',
-                                        price: '₱${item['price']}',
-                                        description: item['description'] ?? '',
-                                      ),
+                                    (item) => TrendingItem(
+                                      image:
+                                          item['image_path'] != null &&
+                                                  item['image_path']
+                                                      .toString()
+                                                      .isNotEmpty
+                                              ? '${AppConfig.baseUrl}/storage/${item['image_path']}'
+                                              : 'assets/images/product_placeholder.png',
+                                      name: item['name'] ?? '',
+                                      price: '₱${item['price']}',
+                                      description: item['description'] ?? '',
                                     ),
                                   )
                                   .toList(),
                         ),
                       ),
-                      SizedBox(height: 20),
+                      SizedBox(height: 28),
+                      // Admin's Picks Section
                       Text(
                         lang.isFilipino() ? "Pinili ng Admin" : "Admin's Picks",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: theme.textColor,
+                          fontSize: 18,
                         ),
                       ),
-                      SizedBox(height: 8),
+                      SizedBox(height: 12),
                       Column(
                         children:
                             getRandomProducts(5)
@@ -547,13 +584,18 @@ class _HomePageState extends State<HomePage>
                                 )
                                 .toList(),
                       ),
-                      SizedBox(height: 20),
+                      SizedBox(height: 32),
                       Center(
                         child: Text(
                           lang.isFilipino() ? "Tingnan Lahat" : "See All",
-                          style: TextStyle(color: theme.buttonColor),
+                          style: TextStyle(
+                            color: theme.buttonColor,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
                         ),
                       ),
+                      SizedBox(height: 16),
                     ],
                   ),
                 ),
@@ -562,6 +604,7 @@ class _HomePageState extends State<HomePage>
   }
 }
 
+// Beautified TrendingItem
 class TrendingItem extends StatelessWidget {
   final String image;
   final String name;
@@ -569,6 +612,7 @@ class TrendingItem extends StatelessWidget {
   final String description;
 
   const TrendingItem({
+    super.key,
     required this.image,
     required this.name,
     required this.price,
@@ -577,6 +621,7 @@ class TrendingItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Provider.of<ThemeModel>(context);
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -587,7 +632,7 @@ class TrendingItem extends StatelessWidget {
                   name: name,
                   price: price,
                   image: image,
-                  rating: 5, // Default rating, update if you have ratings
+                  rating: 5,
                   description: description,
                 ),
           ),
@@ -595,34 +640,68 @@ class TrendingItem extends StatelessWidget {
       },
       child: Container(
         width: 180,
-        margin: EdgeInsets.only(right: 12),
+        margin: EdgeInsets.only(right: 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 8,
+              offset: Offset(0, 4),
+            ),
+          ],
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            image.startsWith('http')
-                ? Image.network(
-                  image,
-                  height: 120,
-                  width: 180,
-                  fit: BoxFit.cover,
-                )
-                : Image.asset(
-                  image,
-                  height: 120,
-                  width: 180,
-                  fit: BoxFit.cover,
-                ),
-            SizedBox(height: 6),
-            Text(
-              name,
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+            ClipRRect(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+              child:
+                  image.startsWith('http')
+                      ? Image.network(
+                        image,
+                        height: 120,
+                        width: 180,
+                        fit: BoxFit.cover,
+                      )
+                      : Image.asset(
+                        image,
+                        height: 120,
+                        width: 180,
+                        fit: BoxFit.cover,
+                      ),
             ),
-            Text(price, style: TextStyle(color: Colors.red)),
-            Text(
-              description,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(fontSize: 12),
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    name,
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: theme.textColor,
+                    ),
+                  ),
+                  SizedBox(height: 2),
+                  Text(
+                    price,
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  SizedBox(height: 2),
+                  Text(
+                    description,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 12, color: Colors.grey[700]),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -631,6 +710,7 @@ class TrendingItem extends StatelessWidget {
   }
 }
 
+// Beautified RecommendedItem
 class RecommendedItem extends StatelessWidget {
   final String image;
   final String name;
@@ -639,6 +719,7 @@ class RecommendedItem extends StatelessWidget {
   final String description;
 
   const RecommendedItem({
+    super.key,
     required this.image,
     required this.name,
     required this.price,
@@ -649,7 +730,6 @@ class RecommendedItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<ThemeModel>(context);
-
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -666,34 +746,64 @@ class RecommendedItem extends StatelessWidget {
           ),
         );
       },
-      child: ListTile(
-        contentPadding: EdgeInsets.symmetric(vertical: 6),
-        leading:
-            image.startsWith('http')
-                ? Image.network(image, width: 80, height: 80, fit: BoxFit.cover)
-                : Image.asset(image, width: 80, height: 80, fit: BoxFit.cover),
-        title: Text(name, style: TextStyle(fontWeight: FontWeight.w500)),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(price, style: TextStyle(color: Colors.red)),
-            Row(
-              children: List.generate(
-                5,
-                (index) => Icon(
-                  Icons.star,
-                  size: 16,
-                  color: index < rating ? theme.starColor : Colors.grey[300],
+      child: Card(
+        margin: EdgeInsets.symmetric(vertical: 8, horizontal: 0),
+        elevation: 3,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        child: ListTile(
+          contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+          leading: ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child:
+                image.startsWith('http')
+                    ? Image.network(
+                      image,
+                      width: 80,
+                      height: 80,
+                      fit: BoxFit.cover,
+                    )
+                    : Image.asset(
+                      image,
+                      width: 80,
+                      height: 80,
+                      fit: BoxFit.cover,
+                    ),
+          ),
+          title: Text(
+            name,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: theme.textColor,
+            ),
+          ),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                price,
+                style: TextStyle(
+                  color: Colors.red,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
-            ),
-            Text(
-              description,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(fontSize: 12),
-            ),
-          ],
+              Row(
+                children: List.generate(
+                  5,
+                  (index) => Icon(
+                    Icons.star,
+                    size: 16,
+                    color: index < rating ? theme.starColor : Colors.grey[300],
+                  ),
+                ),
+              ),
+              Text(
+                description,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: 12, color: Colors.grey[700]),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -701,12 +811,14 @@ class RecommendedItem extends StatelessWidget {
 }
 
 class MainScreen extends StatefulWidget {
+  const MainScreen({super.key});
+
   @override
   _MainScreenState createState() => _MainScreenState();
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int _currentIndex = 0;
+  final int _currentIndex = 0;
 
   final List<Widget Function()> _screenBuilders = [
     () => HomePage(),
@@ -732,7 +844,7 @@ class CategoryTile extends StatelessWidget {
   final IconData icon;
   final String label;
 
-  const CategoryTile({required this.icon, required this.label});
+  const CategoryTile({super.key, required this.icon, required this.label});
 
   @override
   Widget build(BuildContext context) {

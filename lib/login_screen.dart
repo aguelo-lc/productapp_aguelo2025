@@ -78,97 +78,196 @@ class _LoginScreenState extends State<LoginScreen> {
 
     return Scaffold(
       backgroundColor: theme.scaffoldColor,
-      appBar: AppBar(
-        title: Text(lang.isFilipino() ? 'Mag-login' : 'Login'),
-        backgroundColor: theme.appBarColor,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              lang.isFilipino()
-                  ? 'Maligayang Pagdating sa Shop It!'
-                  : 'Welcome to Shop It!',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: theme.textColor,
-              ),
+      body: Center(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 24.0,
+              vertical: 32.0,
             ),
-            SizedBox(height: 32),
-            if (_errorMessage != null) ...[
-              Text(_errorMessage!, style: TextStyle(color: Colors.red)),
-              SizedBox(height: 16),
-            ],
-            TextField(
-              controller: _emailController,
-              decoration: InputDecoration(
-                labelText: lang.isFilipino() ? 'Email' : 'Email',
-                labelStyle: TextStyle(color: theme.textColor),
-                border: OutlineInputBorder(),
-              ),
-            ),
-            SizedBox(height: 16),
-            TextField(
-              controller: _passwordController,
-              obscureText: !_isPasswordVisible,
-              decoration: InputDecoration(
-                labelText: lang.isFilipino() ? 'Password' : 'Password',
-                labelStyle: TextStyle(color: theme.textColor),
-                border: OutlineInputBorder(),
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    _isPasswordVisible
-                        ? Icons.visibility
-                        : Icons.visibility_off,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // App logo or icon (optional, can be replaced with your logo)
+                Container(
+                  decoration: BoxDecoration(
+                    color: theme.buttonColor.withOpacity(0.08),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: theme.buttonColor.withOpacity(0.15),
+                        blurRadius: 16,
+                        offset: Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  padding: EdgeInsets.all(24),
+                  child: Icon(
+                    Icons.shopping_bag_rounded,
+                    size: 48,
+                    color: theme.buttonColor,
+                  ),
+                ),
+                SizedBox(height: 24),
+                Text(
+                  lang.isFilipino()
+                      ? 'Maligayang Pagdating sa Shop It!'
+                      : 'Welcome to Shop It!',
+                  style: TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold,
                     color: theme.textColor,
                   ),
-                  onPressed: () {
-                    setState(() {
-                      _isPasswordVisible = !_isPasswordVisible;
-                    });
-                  },
+                  textAlign: TextAlign.center,
                 ),
-              ),
-            ),
-            SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _isLoading ? null : () => _login(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: theme.buttonColor,
-                  padding: EdgeInsets.symmetric(horizontal: 48, vertical: 12),
-                ),
-                child:
-                    _isLoading
-                        ? SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2,
+                SizedBox(height: 32),
+                if (_errorMessage != null) ...[
+                  Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: Colors.red.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      _errorMessage!,
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                ],
+                Card(
+                  elevation: 6,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  color: Colors.white,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 28,
+                    ),
+                    child: Column(
+                      children: [
+                        TextField(
+                          controller: _emailController,
+                          keyboardType: TextInputType.emailAddress,
+                          decoration: InputDecoration(
+                            labelText: lang.isFilipino() ? 'Email' : 'Email',
+                            labelStyle: TextStyle(
+                              color: theme.textColor.withOpacity(0.7),
+                            ),
+                            filled: true,
+                            fillColor: theme.scaffoldColor.withOpacity(0.5),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14),
+                              borderSide: BorderSide.none,
+                            ),
+                            prefixIcon: Icon(
+                              Icons.email_rounded,
+                              color: theme.buttonColor,
+                            ),
                           ),
-                        )
-                        : Text(
-                          lang.isFilipino() ? 'Magpatuloy' : 'Continue',
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(color: theme.textColor),
                         ),
-              ),
+                        SizedBox(height: 18),
+                        TextField(
+                          controller: _passwordController,
+                          obscureText: !_isPasswordVisible,
+                          decoration: InputDecoration(
+                            labelText:
+                                lang.isFilipino() ? 'Password' : 'Password',
+                            labelStyle: TextStyle(
+                              color: theme.textColor.withOpacity(0.7),
+                            ),
+                            filled: true,
+                            fillColor: theme.scaffoldColor.withOpacity(0.5),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14),
+                              borderSide: BorderSide.none,
+                            ),
+                            prefixIcon: Icon(
+                              Icons.lock_rounded,
+                              color: theme.buttonColor,
+                            ),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _isPasswordVisible
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
+                                color: theme.textColor.withOpacity(0.7),
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _isPasswordVisible = !_isPasswordVisible;
+                                });
+                              },
+                            ),
+                          ),
+                          style: TextStyle(color: theme.textColor),
+                        ),
+                        SizedBox(height: 28),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed:
+                                _isLoading ? null : () => _login(context),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: theme.buttonColor,
+                              padding: EdgeInsets.symmetric(vertical: 14),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              elevation: 2,
+                            ),
+                            child:
+                                _isLoading
+                                    ? SizedBox(
+                                      width: 24,
+                                      height: 24,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                    : Text(
+                                      lang.isFilipino()
+                                          ? 'Magpatuloy'
+                                          : 'Continue',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                          ),
+                        ),
+                        SizedBox(height: 16),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: TextButton(
+                            onPressed: () {},
+                            child: Text(
+                              lang.isFilipino()
+                                  ? 'Nakalimutan ang password?'
+                                  : 'Forgot Password?',
+                              style: TextStyle(
+                                color: theme.buttonColor,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
-            SizedBox(height: 16),
-            TextButton(
-              onPressed: () {},
-              child: Text(
-                lang.isFilipino()
-                    ? 'Nakalimutan ang password?'
-                    : 'Forgot Password?',
-                style: TextStyle(color: theme.textColor),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );

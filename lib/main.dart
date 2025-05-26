@@ -6,7 +6,7 @@ import 'models/theme_model.dart';
 import 'theme_screen.dart';
 import 'language_screen.dart';
 import 'widgets/main_screen.dart';
-import 'user_profile_screen.dart'; // <-- Import MainScreen
+import 'user_profile_screen.dart';
 
 void main() {
   runApp(
@@ -21,6 +21,8 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<ThemeModel>(context);
@@ -41,7 +43,6 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       // main.dart
-      // Add this import
 
       // Inside MaterialApp
       routes: {
@@ -49,7 +50,7 @@ class MyApp extends StatelessWidget {
         '/home': (context) => MainScreen(),
         '/language': (context) => LanguageScreen(),
         '/theme': (context) => ThemeScreen(),
-        '/profile': (context) => UserProfileScreen(), // Add this route
+        '/profile': (context) => UserProfileScreen(),
       },
     );
   }

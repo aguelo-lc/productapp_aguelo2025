@@ -11,8 +11,7 @@ import 'config.dart';
 class AddProductScreen extends StatefulWidget {
   final Map<String, dynamic>? product; // <-- Add this line
 
-  const AddProductScreen({this.product, Key? key})
-    : super(key: key); // <-- Update constructor
+  const AddProductScreen({this.product, super.key}); // <-- Update constructor
 
   @override
   _AddProductScreenState createState() => _AddProductScreenState();
@@ -30,7 +29,6 @@ class _AddProductScreenState extends State<AddProductScreen>
   bool _isSubmitting = false;
   String? _errorMessage;
   File? _selectedImage;
-  final ImagePicker _picker = ImagePicker();
   int? _userId;
 
   @override
@@ -152,6 +150,8 @@ class _AddProductScreenState extends State<AddProductScreen>
         title: Text(
           lang.isFilipino() ? 'Magdagdag ng Produkto' : 'Add Product',
         ),
+        backgroundColor:
+            Theme.of(context).appBarTheme.backgroundColor ?? Colors.white,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -161,125 +161,159 @@ class _AddProductScreenState extends State<AddProductScreen>
             child: Column(
               children: [
                 if (_errorMessage != null) ...[
-                  Text(_errorMessage!, style: TextStyle(color: Colors.red)),
+                  Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: Colors.red.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      _errorMessage!,
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
                   SizedBox(height: 8),
                 ],
                 GestureDetector(
                   onTap: pickImage,
                   child:
                       _selectedImage != null
-                          ? Image.file(
-                            _selectedImage!,
-                            height: 120,
-                            width: 120,
-                            fit: BoxFit.cover,
+                          ? ClipRRect(
+                            borderRadius: BorderRadius.circular(16),
+                            child: Image.file(
+                              _selectedImage!,
+                              height: 120,
+                              width: 120,
+                              fit: BoxFit.cover,
+                            ),
                           )
                           : Container(
                             height: 120,
                             width: 120,
-                            color: Colors.grey[300],
+                            decoration: BoxDecoration(
+                              color: Colors.grey[200],
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: Colors.grey[300]!,
+                                width: 1,
+                              ),
+                            ),
                             child: Icon(
                               Icons.camera_alt,
                               size: 40,
-                              color: Colors.grey[700],
+                              color: Colors.grey[500],
                             ),
                           ),
                 ),
-                SizedBox(height: 12),
+                SizedBox(height: 18),
                 TextFormField(
+                  initialValue: _productName,
                   decoration: InputDecoration(
                     labelText:
                         lang.isFilipino()
                             ? 'Pangalan ng Produkto'
                             : 'Product Name',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
+                    ),
+                    filled: true,
+                    fillColor: Colors.grey[100],
                   ),
-                  onSaved: (value) => _productName = value ?? '',
-                  validator:
-                      (value) =>
-                          value == null || value.isEmpty
-                              ? (lang.isFilipino()
-                                  ? 'Ilagay ang pangalan'
-                                  : 'Enter product name')
-                              : null,
+                  onChanged: (v) => _productName = v,
+                  validator: (v) => v == null || v.isEmpty ? 'Required' : null,
                 ),
-                SizedBox(height: 16),
+                SizedBox(height: 14),
                 TextFormField(
+                  initialValue: _price,
                   decoration: InputDecoration(
                     labelText: lang.isFilipino() ? 'Presyo' : 'Price',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
+                    ),
+                    filled: true,
+                    fillColor: Colors.grey[100],
                   ),
                   keyboardType: TextInputType.number,
-                  onSaved: (value) => _price = value ?? '',
-                  validator:
-                      (value) =>
-                          value == null || value.isEmpty
-                              ? (lang.isFilipino()
-                                  ? 'Ilagay ang presyo'
-                                  : 'Enter price')
-                              : null,
+                  onChanged: (v) => _price = v,
+                  validator: (v) => v == null || v.isEmpty ? 'Required' : null,
                 ),
-                SizedBox(height: 16),
+                SizedBox(height: 14),
                 TextFormField(
+                  initialValue: _description,
                   decoration: InputDecoration(
                     labelText:
-                        lang.isFilipino() ? 'Paglalarawan' : 'Description',
+                        lang.isFilipino() ? 'Deskripsyon' : 'Description',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
+                    ),
+                    filled: true,
+                    fillColor: Colors.grey[100],
                   ),
-                  onSaved: (value) => _description = value ?? '',
-                  validator:
-                      (value) =>
-                          value == null || value.isEmpty
-                              ? (lang.isFilipino()
-                                  ? 'Ilagay ang paglalarawan'
-                                  : 'Enter description')
-                              : null,
+                  onChanged: (v) => _description = v,
                 ),
-                SizedBox(height: 16),
+                SizedBox(height: 14),
                 DropdownButtonFormField<String>(
-                  decoration: InputDecoration(
-                    labelText: lang.isFilipino() ? 'Kategorya' : 'Category',
-                  ),
                   value: _selectedCategory,
                   items:
-                      _categoriesApi.map<DropdownMenuItem<String>>((cat) {
-                        return DropdownMenuItem<String>(
-                          value: cat['id'].toString(),
-                          child: Text(cat['name']),
-                        );
-                      }).toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedCategory = value;
-                    });
-                  },
-                  validator:
-                      (value) =>
-                          value == null || value.isEmpty
-                              ? (lang.isFilipino()
-                                  ? 'Pumili ng kategorya'
-                                  : 'Select a category')
-                              : null,
-                ),
-                SizedBox(height: 24),
-                ElevatedButton(
-                  onPressed:
-                      _isSubmitting
-                          ? null
-                          : () {
-                            if (_formKey.currentState!.validate()) {
-                              _formKey.currentState!.save();
-                              submitProduct();
-                            }
-                          },
-                  child:
-                      _isSubmitting
-                          ? SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
+                      _categoriesApi
+                          .map<DropdownMenuItem<String>>(
+                            (cat) => DropdownMenuItem(
+                              value: cat['id'].toString(),
+                              child: Text(cat['name']),
                             ),
                           )
-                          : Text(lang.isFilipino() ? 'Isumite' : 'Submit'),
+                          .toList(),
+                  onChanged: (v) => setState(() => _selectedCategory = v),
+                  decoration: InputDecoration(
+                    labelText: lang.isFilipino() ? 'Kategorya' : 'Category',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
+                    ),
+                    filled: true,
+                    fillColor: Colors.grey[100],
+                  ),
+                  validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                ),
+                SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _isSubmitting ? null : submitProduct,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).primaryColor,
+                      padding: EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      elevation: 2,
+                    ),
+                    child:
+                        _isSubmitting
+                            ? SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
+                            : Text(
+                              lang.isFilipino() ? 'Idagdag' : 'Add',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                  ),
                 ),
               ],
             ),

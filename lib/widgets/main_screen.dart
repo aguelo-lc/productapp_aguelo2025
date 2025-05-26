@@ -4,6 +4,8 @@ import '../add_product_screen.dart';
 import '../user_profile_screen.dart'; // Placeholder for future implementation
 
 class MainScreen extends StatefulWidget {
+  const MainScreen({super.key});
+
   @override
   _MainScreenState createState() => _MainScreenState();
 }

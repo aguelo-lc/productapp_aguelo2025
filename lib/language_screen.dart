@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'models/language_model.dart';
 
 class LanguageScreen extends StatelessWidget {
+  const LanguageScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     final languageModel = Provider.of<LanguageModel>(context);

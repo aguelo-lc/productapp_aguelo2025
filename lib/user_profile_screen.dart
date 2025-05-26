@@ -71,41 +71,52 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               style: TextStyle(fontSize: 16, color: theme.textColor),
             ),
             SizedBox(height: 24),
-            ListTile(
-              leading: Icon(Icons.edit, color: theme.buttonColor),
-              title: Text(
-                lang.isFilipino() ? 'I-edit ang Profile' : 'Edit Profile',
-                style: TextStyle(color: theme.textColor),
+            Card(
+              elevation: 4,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
               ),
-              onTap: () {
-                // Navigate to edit profile screen
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.logout, color: theme.buttonColor),
-              title: Text(
-                lang.isFilipino() ? 'Mag-logout' : 'Logout',
-                style: TextStyle(color: theme.textColor),
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: Icon(Icons.edit, color: theme.buttonColor),
+                    title: Text(
+                      lang.isFilipino() ? 'I-edit ang Profile' : 'Edit Profile',
+                      style: TextStyle(color: theme.textColor),
+                    ),
+                    onTap: () {
+                      // Navigate to edit profile screen
+                    },
+                  ),
+                  Divider(height: 1),
+                  ListTile(
+                    leading: Icon(Icons.logout, color: theme.buttonColor),
+                    title: Text(
+                      lang.isFilipino() ? 'Mag-logout' : 'Logout',
+                      style: TextStyle(color: theme.textColor),
+                    ),
+                    onTap: () async {
+                      final prefs = await SharedPreferences.getInstance();
+                      final token = prefs.getString('token');
+                      if (token != null) {
+                        try {
+                          await http.post(
+                            Uri.parse('${AppConfig.baseUrl}/api/auth/logout'),
+                            headers: {'Authorization': 'Bearer $token'},
+                          );
+                        } catch (e) {
+                          // Optionally handle error
+                        }
+                        await prefs.remove('token');
+                        await prefs.remove('user_id');
+                        await prefs.remove('username');
+                        await prefs.remove('email');
+                      }
+                      Navigator.pushReplacementNamed(context, '/');
+                    },
+                  ),
+                ],
               ),
-              onTap: () async {
-                final prefs = await SharedPreferences.getInstance();
-                final token = prefs.getString('token');
-                if (token != null) {
-                  try {
-                    await http.post(
-                      Uri.parse('${AppConfig.baseUrl}/api/auth/logout'),
-                      headers: {'Authorization': 'Bearer $token'},
-                    );
-                  } catch (e) {
-                    // Optionally handle error
-                  }
-                  await prefs.remove('token');
-                  await prefs.remove('user_id');
-                  await prefs.remove('username');
-                  await prefs.remove('email');
-                }
-                Navigator.pushReplacementNamed(context, '/');
-              },
             ),
           ],
         ),
