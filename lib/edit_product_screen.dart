@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'config.dart';
 
 class EditProductScreen extends StatefulWidget {
+  // Screen for editing an existing product
   final Map<String, dynamic> product;
   const EditProductScreen({required this.product, super.key});
 
@@ -15,6 +16,7 @@ class EditProductScreen extends StatefulWidget {
 }
 
 class _EditProductScreenState extends State<EditProductScreen> {
+  // Form and state variables
   final _formKey = GlobalKey<FormState>();
   late String _productName;
   late String _price;
@@ -28,6 +30,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
   @override
   void initState() {
     super.initState();
+    // Initialize form fields with product data
     _productName = widget.product['name'] ?? '';
     _price = widget.product['price']?.toString() ?? '';
     _description = widget.product['description'] ?? '';
@@ -35,6 +38,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
     fetchCategories();
   }
 
+  // Fetches categories for dropdown
   Future<void> fetchCategories() async {
     final response = await http.get(
       Uri.parse('${AppConfig.baseUrl}/api/categories'),
@@ -48,6 +52,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
   bool _isPickingImage = false;
 
+  // Opens image picker for product image
   Future<void> pickImage() async {
     if (_isPickingImage) return; // Prevent re-entry
     setState(() => _isPickingImage = true);
@@ -64,6 +69,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
     }
   }
 
+  // Submits the edited product to the API
   Future<void> submitEdit() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isSubmitting = true);
@@ -115,13 +121,14 @@ class _EditProductScreenState extends State<EditProductScreen> {
       ),
       body:
           _isSubmitting
-              ? Center(child: CircularProgressIndicator())
+              ? Center(child: CircularProgressIndicator()) // Show loading
               : SingleChildScrollView(
                 padding: EdgeInsets.all(16),
                 child: Form(
                   key: _formKey,
                   child: Column(
                     children: [
+                      // Product image picker
                       GestureDetector(
                         onTap: pickImage,
                         child:
@@ -167,6 +174,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                                 ),
                       ),
                       SizedBox(height: 18),
+                      // Error message display
                       if (_errorMessage != null) ...[
                         Container(
                           width: double.infinity,
@@ -188,6 +196,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                         ),
                         SizedBox(height: 8),
                       ],
+                      // Product name input
                       TextFormField(
                         initialValue: _productName,
                         decoration: InputDecoration(
@@ -204,6 +213,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                             (v) => v == null || v.isEmpty ? 'Required' : null,
                       ),
                       SizedBox(height: 14),
+                      // Price input
                       TextFormField(
                         initialValue: _price,
                         decoration: InputDecoration(
@@ -221,6 +231,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                             (v) => v == null || v.isEmpty ? 'Required' : null,
                       ),
                       SizedBox(height: 14),
+                      // Description input
                       TextFormField(
                         initialValue: _description,
                         decoration: InputDecoration(
@@ -235,6 +246,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                         onChanged: (v) => _description = v,
                       ),
                       SizedBox(height: 14),
+                      // Category dropdown
                       DropdownButtonFormField<String>(
                         value: _selectedCategory,
                         items:
@@ -260,6 +272,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                             (v) => v == null || v.isEmpty ? 'Required' : null,
                       ),
                       SizedBox(height: 24),
+                      // Save button
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(

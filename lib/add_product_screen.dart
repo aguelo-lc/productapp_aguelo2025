@@ -8,10 +8,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'models/language_model.dart';
 import 'config.dart';
 
+// Screen for adding a new product (optionally for editing if product is provided)
 class AddProductScreen extends StatefulWidget {
-  final Map<String, dynamic>? product; // <-- Add this line
+  final Map<String, dynamic>? product;
 
-  const AddProductScreen({this.product, super.key}); // <-- Update constructor
+  const AddProductScreen({this.product, super.key});
 
   @override
   _AddProductScreenState createState() => _AddProductScreenState();
@@ -19,8 +20,8 @@ class AddProductScreen extends StatefulWidget {
 
 class _AddProductScreenState extends State<AddProductScreen>
     with AutomaticKeepAliveClientMixin {
+  // Form and state variables
   final _formKey = GlobalKey<FormState>();
-
   String _productName = '';
   String _price = '';
   String _description = '';
@@ -34,6 +35,7 @@ class _AddProductScreenState extends State<AddProductScreen>
   @override
   void initState() {
     super.initState();
+    // If editing, initialize fields with product data
     if (widget.product != null) {
       _productName = widget.product!['name'] ?? '';
       _price = widget.product!['price']?.toString() ?? '';
@@ -41,10 +43,11 @@ class _AddProductScreenState extends State<AddProductScreen>
       _selectedCategory = widget.product!['category_id']?.toString();
       // Optionally handle image if you want to show it for editing
     }
-    fetchCategories();
-    _loadUserId();
+    fetchCategories(); // Load categories for dropdown
+    _loadUserId(); // Load user ID from local storage
   }
 
+  // Loads user ID from SharedPreferences
   Future<void> _loadUserId() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -52,6 +55,7 @@ class _AddProductScreenState extends State<AddProductScreen>
     });
   }
 
+  // Fetches product categories from API
   Future<void> fetchCategories() async {
     try {
       final response = await http.get(
@@ -69,6 +73,7 @@ class _AddProductScreenState extends State<AddProductScreen>
 
   bool _isPickingImage = false;
 
+  // Opens image picker for product image
   Future<void> pickImage() async {
     if (_isPickingImage) return; // Prevent re-entry
     setState(() => _isPickingImage = true);
@@ -85,6 +90,7 @@ class _AddProductScreenState extends State<AddProductScreen>
     }
   }
 
+  // Submits the new product to the API
   Future<void> submitProduct() async {
     setState(() {
       _isSubmitting = true;
@@ -107,6 +113,7 @@ class _AddProductScreenState extends State<AddProductScreen>
       var streamedResponse = await request.send();
       var response = await http.Response.fromStream(streamedResponse);
       if (response.statusCode == 201) {
+        // Show success message and reset form
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -138,7 +145,7 @@ class _AddProductScreenState extends State<AddProductScreen>
   }
 
   @override
-  bool get wantKeepAlive => true;
+  bool get wantKeepAlive => true; // Keep state alive in tab navigation
 
   @override
   Widget build(BuildContext context) {
@@ -160,6 +167,7 @@ class _AddProductScreenState extends State<AddProductScreen>
           child: SingleChildScrollView(
             child: Column(
               children: [
+                // Error message display
                 if (_errorMessage != null) ...[
                   Container(
                     width: double.infinity,
@@ -178,6 +186,7 @@ class _AddProductScreenState extends State<AddProductScreen>
                   ),
                   SizedBox(height: 8),
                 ],
+                // Product image picker
                 GestureDetector(
                   onTap: pickImage,
                   child:
@@ -210,6 +219,7 @@ class _AddProductScreenState extends State<AddProductScreen>
                           ),
                 ),
                 SizedBox(height: 18),
+                // Product name input
                 TextFormField(
                   initialValue: _productName,
                   decoration: InputDecoration(
@@ -228,6 +238,7 @@ class _AddProductScreenState extends State<AddProductScreen>
                   validator: (v) => v == null || v.isEmpty ? 'Required' : null,
                 ),
                 SizedBox(height: 14),
+                // Price input
                 TextFormField(
                   initialValue: _price,
                   decoration: InputDecoration(
@@ -244,6 +255,7 @@ class _AddProductScreenState extends State<AddProductScreen>
                   validator: (v) => v == null || v.isEmpty ? 'Required' : null,
                 ),
                 SizedBox(height: 14),
+                // Description input
                 TextFormField(
                   initialValue: _description,
                   decoration: InputDecoration(
@@ -259,6 +271,7 @@ class _AddProductScreenState extends State<AddProductScreen>
                   onChanged: (v) => _description = v,
                 ),
                 SizedBox(height: 14),
+                // Category dropdown
                 DropdownButtonFormField<String>(
                   value: _selectedCategory,
                   items:
@@ -283,6 +296,7 @@ class _AddProductScreenState extends State<AddProductScreen>
                   validator: (v) => v == null || v.isEmpty ? 'Required' : null,
                 ),
                 SizedBox(height: 24),
+                // Add button with loading indicator
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(

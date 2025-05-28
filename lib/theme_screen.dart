@@ -4,6 +4,7 @@ import 'models/theme_model.dart';
 import 'models/language_model.dart';
 
 class ThemeScreen extends StatelessWidget {
+  // Screen for selecting and applying app themes
   const ThemeScreen({super.key});
 
   @override
@@ -18,6 +19,7 @@ class ThemeScreen extends StatelessWidget {
       ),
       body: Column(
         children: [
+          // Option for default theme
           RadioListTile<String>(
             title: Text(
               lang.isFilipino() ? "Default na Tema" : "Default Theme",
@@ -29,6 +31,7 @@ class ThemeScreen extends StatelessWidget {
               Navigator.pop(context);
             },
           ),
+          // Option for purple theme
           RadioListTile<String>(
             title: Text(lang.isFilipino() ? "Lilang Tema" : "Purple Theme"),
             value: "purple",

@@ -13,15 +13,17 @@ class MyProductsScreen extends StatefulWidget {
 }
 
 class _MyProductsScreenState extends State<MyProductsScreen> {
+  // List of user's products and loading state
   List<dynamic> myProducts = [];
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    fetchMyProducts();
+    fetchMyProducts(); // Fetch user's products on load
   }
 
+  // Fetches products belonging to the current user
   Future<void> fetchMyProducts() async {
     setState(() => isLoading = true);
     final prefs = await SharedPreferences.getInstance();
@@ -52,6 +54,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
     }
   }
 
+  // Deletes a product by ID and updates the list
   Future<void> deleteProduct(int productId) async {
     final response = await http.delete(
       Uri.parse('${AppConfig.baseUrl}/api/products/$productId'),
@@ -72,7 +75,7 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
       appBar: AppBar(title: Text('My Products')),
       body:
           isLoading
-              ? Center(child: CircularProgressIndicator())
+              ? Center(child: CircularProgressIndicator()) // Show loading
               : ListView.builder(
                 itemCount: myProducts.length,
                 itemBuilder: (context, index) {
@@ -109,9 +112,10 @@ class _MyProductsScreenState extends State<MyProductsScreen> {
                             builder:
                                 (context) => EditProductScreen(product: item),
                           ),
-                        ).then((_) => fetchMyProducts());
+                        ).then((_) => fetchMyProducts()); // Refresh after edit
                       },
                     ),
+                    // Long press to delete with confirmation dialog
                     onLongPress: () async {
                       final confirm = await showDialog<bool>(
                         context: context,

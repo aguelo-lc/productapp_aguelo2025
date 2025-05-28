@@ -4,6 +4,7 @@ import 'models/theme_model.dart'; // Adjust the import path
 import 'category_products_screen.dart'; // Adjust the import path
 
 class ProductDetailPage extends StatelessWidget {
+  // Displays detailed information about a product
   final String name;
   final String price;
   final String image;
@@ -33,6 +34,7 @@ class ProductDetailPage extends StatelessWidget {
             title: const Text("Shop It!"),
             backgroundColor: theme.appBarColor,
             actions: [
+              // User avatar in app bar
               CircleAvatar(
                 backgroundColor: theme.buttonColor,
                 child: const Text("A", style: TextStyle(color: Colors.white)),
@@ -45,10 +47,12 @@ class ProductDetailPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Product image
                 image.startsWith('http')
                     ? Image.network(image)
                     : Image.asset(image),
                 const SizedBox(height: 12),
+                // Product name
                 Text(
                   name,
                   style: TextStyle(
@@ -57,11 +61,12 @@ class ProductDetailPage extends StatelessWidget {
                     color: theme.textColor,
                   ),
                 ),
+                // Product price
                 Text(
                   price,
                   style: const TextStyle(fontSize: 18, color: Colors.red),
                 ),
-                // Category section
+                // Category section with navigation
                 if (category != null &&
                     (category!['name']?.toString().isNotEmpty ?? false))
                   Padding(
@@ -110,6 +115,7 @@ class ProductDetailPage extends StatelessWidget {
                       ),
                     ),
                   ),
+                // Product rating stars
                 Row(
                   children: List.generate(
                     5,
@@ -121,6 +127,7 @@ class ProductDetailPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 12),
+                // Buy button (not yet implemented)
                 ElevatedButton.icon(
                   onPressed: () {},
                   style: ElevatedButton.styleFrom(
@@ -131,6 +138,7 @@ class ProductDetailPage extends StatelessWidget {
                   label: const Text("Buy Product"),
                 ),
                 const SizedBox(height: 12),
+                // Product description
                 Text(
                   "Description",
                   style: TextStyle(
@@ -141,6 +149,7 @@ class ProductDetailPage extends StatelessWidget {
                 const SizedBox(height: 6),
                 Text(description, style: TextStyle(color: theme.textColor)),
                 const Divider(height: 30),
+                // Seller info (static for now)
                 ListTile(
                   leading: Icon(Icons.store, color: theme.textColor),
                   title: Text(
@@ -154,6 +163,7 @@ class ProductDetailPage extends StatelessWidget {
                   trailing: const CircleAvatar(child: Text("A")),
                 ),
                 const Divider(height: 30),
+                // Recommended section (static title)
                 Text(
                   "Recommended For You",
                   style: TextStyle(
@@ -163,6 +173,7 @@ class ProductDetailPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 const Divider(height: 30),
+                // Reviews section (static content)
                 Text(
                   "Reviews",
                   style: TextStyle(

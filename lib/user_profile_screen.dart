@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'config.dart';
 
 class UserProfileScreen extends StatefulWidget {
+  // Screen for displaying and managing user profile info
   const UserProfileScreen({super.key});
 
   @override
@@ -15,15 +16,17 @@ class UserProfileScreen extends StatefulWidget {
 }
 
 class _UserProfileScreenState extends State<UserProfileScreen> {
+  // User info state
   String? username;
   String? email;
 
   @override
   void initState() {
     super.initState();
-    _loadUserInfo();
+    _loadUserInfo(); // Load user info from local storage
   }
 
+  // Loads username and email from SharedPreferences
   Future<void> _loadUserInfo() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -46,6 +49,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         padding: const EdgeInsets.all(24.0),
         child: Column(
           children: [
+            // User avatar with initial
             CircleAvatar(
               radius: 50,
               backgroundColor: theme.buttonColor,
@@ -57,6 +61,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               ),
             ),
             SizedBox(height: 16),
+            // Username display
             Text(
               username ?? '',
               style: TextStyle(
@@ -66,11 +71,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               ),
             ),
             SizedBox(height: 8),
+            // Email display
             Text(
               email ?? '',
               style: TextStyle(fontSize: 16, color: theme.textColor),
             ),
             SizedBox(height: 24),
+            // Profile actions card
             Card(
               elevation: 4,
               shape: RoundedRectangleBorder(
@@ -78,6 +85,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               ),
               child: Column(
                 children: [
+                  // Edit profile option (not implemented)
                   ListTile(
                     leading: Icon(Icons.edit, color: theme.buttonColor),
                     title: Text(
@@ -89,6 +97,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     },
                   ),
                   Divider(height: 1),
+                  // Logout option
                   ListTile(
                     leading: Icon(Icons.logout, color: theme.buttonColor),
                     title: Text(

@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+// LoginScreen is the entry point for user authentication
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -15,12 +16,15 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  // Controllers for email and password input fields
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  // State variables for loading, error, and password visibility
   bool _isLoading = false;
   String? _errorMessage;
   bool _isPasswordVisible = false;
 
+  // Handles login logic, API call, and local storage
   Future<void> _login(BuildContext context) async {
     setState(() {
       _isLoading = true;
@@ -88,7 +92,7 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // App logo or icon (optional, can be replaced with your logo)
+                // App logo or icon
                 Container(
                   decoration: BoxDecoration(
                     color: theme.buttonColor.withOpacity(0.08),
@@ -109,6 +113,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 SizedBox(height: 24),
+                // Welcome text, localized
                 Text(
                   lang.isFilipino()
                       ? 'Maligayang Pagdating sa Shop It!'
@@ -121,6 +126,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   textAlign: TextAlign.center,
                 ),
                 SizedBox(height: 32),
+                // Error message display
                 if (_errorMessage != null) ...[
                   Container(
                     width: double.infinity,
@@ -139,6 +145,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   SizedBox(height: 16),
                 ],
+                // Login form card
                 Card(
                   elevation: 6,
                   shape: RoundedRectangleBorder(
@@ -152,6 +159,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     child: Column(
                       children: [
+                        // Email input
                         TextField(
                           controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
@@ -174,6 +182,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           style: TextStyle(color: theme.textColor),
                         ),
                         SizedBox(height: 18),
+                        // Password input with visibility toggle
                         TextField(
                           controller: _passwordController,
                           obscureText: !_isPasswordVisible,
@@ -210,6 +219,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           style: TextStyle(color: theme.textColor),
                         ),
                         SizedBox(height: 28),
+                        // Login button with loading indicator
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
@@ -246,6 +256,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         SizedBox(height: 16),
+                        // Forgot password button (not yet implemented)
                         Align(
                           alignment: Alignment.centerRight,
                           child: TextButton(

@@ -22,6 +22,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage>
     with AutomaticKeepAliveClientMixin {
+  // State for products and categories
   List<dynamic> products = [];
   List<dynamic> categoriesApi = [];
   bool isLoading = true;
@@ -32,10 +33,11 @@ class _HomePageState extends State<HomePage>
   @override
   void initState() {
     super.initState();
-    fetchProducts();
-    fetchCategories();
+    fetchProducts(); // Fetch product list on load
+    fetchCategories(); // Fetch categories on load
   }
 
+  // Fetches all products from API
   Future<void> fetchProducts() async {
     setState(() {
       isLoading = true;
@@ -65,6 +67,7 @@ class _HomePageState extends State<HomePage>
     }
   }
 
+  // Fetches all categories from API
   Future<void> fetchCategories() async {
     try {
       final response = await http.get(
@@ -80,6 +83,7 @@ class _HomePageState extends State<HomePage>
     }
   }
 
+  // Returns a random subset of products
   List<dynamic> getRandomProducts(int count) {
     if (products.length <= count) return List.from(products);
     final List<dynamic> copy = List.from(products);
@@ -87,6 +91,7 @@ class _HomePageState extends State<HomePage>
     return copy.take(count).toList();
   }
 
+  // Returns a random subset of categories
   List<dynamic> getRandomCategories(int count) {
     if (categoriesApi.length <= count) return List.from(categoriesApi);
     final List<dynamic> copy = List.from(categoriesApi);
@@ -95,7 +100,7 @@ class _HomePageState extends State<HomePage>
   }
 
   @override
-  bool get wantKeepAlive => true;
+  bool get wantKeepAlive => true; // Keep state alive in tab navigation
 
   @override
   Widget build(BuildContext context) {
@@ -109,6 +114,7 @@ class _HomePageState extends State<HomePage>
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
+            // Drawer header with user avatar and welcome
             DrawerHeader(
               decoration: BoxDecoration(
                 color: theme.drawerHeaderColor,
@@ -152,6 +158,7 @@ class _HomePageState extends State<HomePage>
                 ],
               ),
             ),
+            // Drawer navigation options
             ListTile(
               leading: Icon(Icons.color_lens, color: theme.textColor),
               title: Text(
@@ -279,7 +286,7 @@ class _HomePageState extends State<HomePage>
       ),
       body:
           isLoading
-              ? Center(child: CircularProgressIndicator())
+              ? Center(child: CircularProgressIndicator()) // Loading indicator
               : errorMessage != null
               ? Center(
                 child: Text(
@@ -298,6 +305,7 @@ class _HomePageState extends State<HomePage>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Search bar
                       Container(
                         decoration: BoxDecoration(
                           color: theme.scaffoldColor,
@@ -330,6 +338,7 @@ class _HomePageState extends State<HomePage>
                         ),
                       ),
                       SizedBox(height: 18),
+                      // Banner image
                       ClipRRect(
                         borderRadius: BorderRadius.circular(16),
                         child: Container(
@@ -351,6 +360,7 @@ class _HomePageState extends State<HomePage>
                         ),
                       ),
                       SizedBox(height: 28),
+                      // Categories section
                       Row(
                         children: [
                           Text(
@@ -372,6 +382,7 @@ class _HomePageState extends State<HomePage>
                         ],
                       ),
                       SizedBox(height: 12),
+                      // Horizontal list of categories
                       SizedBox(
                         height: 100,
                         child: ListView(
@@ -471,6 +482,7 @@ class _HomePageState extends State<HomePage>
                         ),
                       ),
                       SizedBox(height: 12),
+                      // Horizontal trending products
                       SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: Row(
@@ -506,6 +518,7 @@ class _HomePageState extends State<HomePage>
                         ),
                       ),
                       SizedBox(height: 12),
+                      // Recommended products (vertical)
                       Column(
                         children:
                             getRandomProducts(6)
@@ -534,6 +547,7 @@ class _HomePageState extends State<HomePage>
                         ),
                       ),
                       SizedBox(height: 12),
+                      // Horizontal hot deals
                       SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: Row(
@@ -567,6 +581,7 @@ class _HomePageState extends State<HomePage>
                         ),
                       ),
                       SizedBox(height: 12),
+                      // Admin's picks (vertical)
                       Column(
                         children:
                             getRandomProducts(5)
@@ -585,6 +600,7 @@ class _HomePageState extends State<HomePage>
                                 .toList(),
                       ),
                       SizedBox(height: 32),
+                      // See all link
                       Center(
                         child: Text(
                           lang.isFilipino() ? "Tingnan Lahat" : "See All",
