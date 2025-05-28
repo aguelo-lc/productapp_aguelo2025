@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:productapp_aguelo2025/models/theme_model.dart';
+import 'package:provider/provider.dart';
 import '../product_detail_page.dart'; // Adjust if needed
 
 class RecommendedItem extends StatelessWidget {
@@ -9,6 +11,7 @@ class RecommendedItem extends StatelessWidget {
   final String description;
 
   const RecommendedItem({
+    super.key,
     required this.image,
     required this.name,
     required this.price,
@@ -18,18 +21,21 @@ class RecommendedItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Provider.of<ThemeModel>(context);
+
     return GestureDetector(
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ProductDetailPage(
-              name: name,
-              price: price,
-              image: image,
-              rating: rating,
-              description: description,
-            ),
+            builder:
+                (context) => ProductDetailPage(
+                  name: name,
+                  price: price,
+                  image: image,
+                  rating: rating,
+                  description: description,
+                ),
           ),
         );
       },
@@ -47,7 +53,7 @@ class RecommendedItem extends StatelessWidget {
                 (index) => Icon(
                   Icons.star,
                   size: 16,
-                  color: index < rating ? Colors.yellow : Colors.grey[300],
+                  color: index < rating ? theme.starColor : Colors.grey[300],
                 ),
               ),
             ),
